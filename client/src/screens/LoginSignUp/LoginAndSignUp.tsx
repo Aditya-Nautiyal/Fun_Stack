@@ -31,6 +31,8 @@ import {
   GENERIC_SUCCESS,
   SUCCESS,
 } from "../../constants/codes.jsx";
+import { useNavigate } from "react-router-dom";
+import { MemoryGame } from "../../constants/navigation.jsx";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
 function LoginAndSignUp() {
@@ -42,6 +44,8 @@ function LoginAndSignUp() {
   const [passwordValidation, setPasswordValidation] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const validationStringArray = [
     AT_LEAST_UPPER_CASE,
@@ -80,6 +84,7 @@ function LoginAndSignUp() {
     });
     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
       toast.success(result?.data?.desc, ToastMsgStructure);
+      navigate(MemoryGame);
     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
       toast.error(result?.data?.desc, ToastMsgStructure);
     } else {
