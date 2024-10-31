@@ -1,0 +1,97 @@
+.common-flex-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parentMGameWrapper {
+  width: 100%;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+}
+
+.mGameContainer {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 20px;
+  min-width: 36vh;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  z-index: 1;
+  border: 1px solid black;
+}
+
+.mGameBodyWrapper {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f4f4f4;
+  padding-top: 45px;
+  padding-bottom: 45px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  z-index: 1;
+}
+
+.headerContent {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mGameTitle {
+  font-family: cursive;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333; /* Dark color for text */
+}
+
+.newButtonMGame {
+  font-family: cursive;
+  background-color: #ffa500; /* Orange-yellow color */
+  color: white; /* Text color */
+  font-size: 14px; /* Font size */
+  font-weight: bold;
+  padding: 10px 20px; /* Spacing around the text */
+  border: none; /* Remove default border */
+  border-radius: 20px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.newButtonMGame:hover {
+    background-color: #e69500; /* Slightly darker shade on hover */
+}
+
+.mGameHeaderButtonWrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+}
+
+.styled-select {
+    
+}
+
+/* Hover effect */
+.styled-select:hover {
+    background-color: #e69500; /* Slightly darker shade on hover */
+}
