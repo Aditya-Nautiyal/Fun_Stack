@@ -9,6 +9,8 @@
   min-height: 100vh;
   background-size: cover;
   background-position: center;
+  display: flex;
+  flex: 1;
 }
 
 .mGameContainer {
@@ -25,16 +27,15 @@
   top: 0;
   width: 100%;
   color: white;
-  padding-top: 10px;
-  padding-bottom: 10px;
   z-index: 1;
   border: 1px solid black;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .mGameBodyWrapper {
   flex: 1;
   overflow-y: auto;
-  background-color: #f4f4f4;
 }
 
 .footer {
@@ -60,9 +61,11 @@
   font-size: 16px;
   font-weight: bold;
   color: #333; /* Dark color for text */
+  padding-left: 20px;
 }
 
-.newButtonMGame {
+.newButtonMGame,
+.styled-select {
   font-family: cursive;
   background-color: #ffa500; /* Orange-yellow color */
   color: white; /* Text color */
@@ -76,17 +79,42 @@
 }
 
 .newButtonMGame:hover {
-    background-color: #e69500; /* Slightly darker shade on hover */
+  background-color: #e69500; /* Slightly darker shade on hover */
 }
 
-.mGameHeaderButtonWrapper{
+.mGameHeaderButtonWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1vw;
+  gap: 2vw;
+  padding-right: 40px;
 }
 
 /* Hover effect */
+.styled-select {
+  background-color: white;
+  font-weight: bold;
+  color: #333;
+  border-radius: 5px;
+  padding: 5px;
+  border: 0.1px solid black;
+}
+
 .styled-select:hover {
-    background-color: #e69500; /* Slightly darker shade on hover */
+  background-color: #f4f4f4;
+}
+
+.circleBox{
+  background-color: blue;
+  min-width: 400px;
+  min-height: 400px;
+  
+}
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+  .headerContent,
+  .mGameHeaderButtonWrapper {
+    flex-direction: column; /* Stacks the divs vertically */
+  }
 }
