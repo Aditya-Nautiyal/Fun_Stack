@@ -35,18 +35,17 @@
   flex: 1;
   overflow-y: auto;
   background-color: #f4f4f4;
-  padding-top: 45px;
-  padding-bottom: 45px;
 }
 
 .footer {
   position: fixed;
   bottom: 0;
   width: 100%;
-  color: white;
+  color: black;
   padding: 10px;
   text-align: center;
   z-index: 1;
+  border: 1px solid red;
 }
 
 .headerContent {
@@ -85,10 +84,6 @@
   align-items: center;
   justify-content: center;
   gap: 1vw;
-}
-
-.styled-select {
-    
 }
 
 /* Hover effect */
