@@ -123,7 +123,9 @@
 
 /* Hover effect */
 .mGameCircle:hover {
-  background-color: rgb(100, 95, 125); /* Change color on hover (optional) */
+  background-color: rgb(100, 95, 125); /* Change color on hover */
+  border-color: rgb(200, 200, 200);     /* Add border color on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
   cursor: pointer;
 }
 

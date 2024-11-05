@@ -1,4 +1,10 @@
 import { useRef, useEffect, useState } from "react";
+import {
+  FUN_STACK,
+  NEW_GAME,
+  TOW_BY_TOW,
+  FOUR_BY_FOUR,
+} from "../../constants/string";
 import "./MemoryGame.css";
 
 export default function MemoryGame() {
@@ -9,13 +15,13 @@ export default function MemoryGame() {
   const [itemCount, setItemCount] = useState(64);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
-  const [options, setOptions] = useState([
+  const [options] = useState([
     {
-      label: "2 * 2",
+      label: TOW_BY_TOW,
       value: 2,
     },
     {
-      label: "4 * 4",
+      label: FOUR_BY_FOUR,
       value: 4,
     },
   ]);
@@ -35,7 +41,9 @@ export default function MemoryGame() {
     setItems(res);
   }, [itemCount]);
 
-   useEffect(() => {setItemCount(dropdownValue * dropdownValue);}, [dropdownValue]);
+  useEffect(() => {
+    setItemCount(dropdownValue * dropdownValue);
+  }, [dropdownValue]);
 
   const circularStructure = () => <div className="mGameCircle" />;
 
@@ -57,9 +65,9 @@ export default function MemoryGame() {
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>
         <div className="headerContent">
-          <div className="mGameTitle">Fun Stack</div>
+          <div className="mGameTitle">{FUN_STACK}</div>
           <div className="mGameHeaderButtonWrapper">
-            <button className="newButtonMGame">New game</button>
+            <button className="newButtonMGame">{NEW_GAME}</button>
             <select
               id="options"
               className="styled-select"

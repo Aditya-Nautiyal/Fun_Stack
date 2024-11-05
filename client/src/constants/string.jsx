@@ -13,6 +13,10 @@ export const AT_LEAST_LETTERS = "At least 8 characters long";
 export const SHOW_PASSWORD = "Show password";
 export const GO_BACK = "Go Back";
 export const PAGE_NOT_FOUND = "Oops! Page not found";
+export const FUN_STACK = "Fun Stack";
+export const NEW_GAME = "New game";
+export const TOW_BY_TOW = "2 * 2";
+export const FOUR_BY_FOUR = "4 * 4";
 
 
 
