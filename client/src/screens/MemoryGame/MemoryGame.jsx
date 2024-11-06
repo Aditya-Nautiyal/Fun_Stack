@@ -12,6 +12,7 @@ export default function MemoryGame() {
   const footerRef = useRef(null); // Create a ref for the div
 
   const [items, setItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [itemCount, setItemCount] = useState(64);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
@@ -45,7 +46,19 @@ export default function MemoryGame() {
     setItemCount(dropdownValue * dropdownValue);
   }, [dropdownValue]);
 
-  const circularStructure = () => <div className="mGameCircle" />;
+  const cirleClicked = (ele) => {
+    if (selectedItems.some((item) => item.id === ele.id)) {
+      setSelectedItems(selectedItems.filter((item) => item.id !== ele.id));
+      setItems((item) =>
+        item.id === ele.id ? { ...item, visible: false } : item
+      );
+    } else {
+      setSelectedItems([...selectedItems, ele]);
+      setItems((item) =>
+        item.id === ele.id ? { ...item, visible: true } : item
+      );
+    }
+  };
 
   const bodyStruture = () => {
     return (
@@ -56,7 +69,20 @@ export default function MemoryGame() {
         }}
       >
         {items.map((ele, index) => (
-          <div key={`${index}${ele.id}`}>{circularStructure()}</div>
+          <div key={`${index}${ele.id}`} onClick={() => cirleClicked(ele)}>
+            <div
+              className={`mGameCircle ${
+                selectedItems.some((item) => item.id === ele.id)
+                  ? "is-flipped"
+                  : ""
+              }`}
+            >
+              {/* Initial button content */}
+              <div className="front"/>
+              {/* Content after flip */}
+              <div className="back">{ele.id}</div>
+            </div>
+          </div>
         ))}
       </div>
     );
