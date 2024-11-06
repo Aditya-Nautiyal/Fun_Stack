@@ -35,7 +35,16 @@ export default function MemoryGame() {
     if (footerRef.current) {
       setFooterHeight(footerRef.current.offsetHeight); // Set the height from the ref
     }
-    const res = Array.from({ length: itemCount }, (v, i) => {
+    const res = shuffleArrayInPlace(itemsGeneration());
+    setItems(res);
+  }, [itemCount]);
+
+  useEffect(() => {
+    setItemCount(dropdownValue * dropdownValue);
+  }, [dropdownValue]);
+
+  const itemsGeneration = () => {
+    return Array.from({ length: itemCount }, (v, i) => {
       // Calculate the pair index (0, 1 for the first pair, 2, 3 for the second pair, etc.)
       const pairIndex = Math.floor(i / 2);
       return {
@@ -44,12 +53,7 @@ export default function MemoryGame() {
         comparingValue: pairIndex, // Assign same comparingValue to two consecutive items
       };
     });
-    setItems(res);
-  }, [itemCount]);
-
-  useEffect(() => {
-    setItemCount(dropdownValue * dropdownValue);
-  }, [dropdownValue]);
+  };
 
   const cirleClicked = (ele) => {
     if (selectedItems.some((item) => item.id === ele.id)) {
@@ -66,14 +70,24 @@ export default function MemoryGame() {
   };
 
   const newGameButtonClicked = () => {
-    const res = Array.from({ length: itemCount }, (v, i) => ({
-      id: i,
-      visible: false, // Example: alternate visibility
-    }));
+    const res = shuffleArrayInPlace(itemsGeneration());
     setItems(res);
     setSelectedItems([]);
   };
 
+  const onDropdownSelect = (e) => {
+    newGameButtonClicked();
+    setDropdownValue(e.target.value)
+  };
+
+  const shuffleArrayInPlace = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+  
   const bodyStruture = () => {
     return (
       <div
@@ -113,7 +127,7 @@ export default function MemoryGame() {
             <select
               id="options"
               className="styled-select"
-              onChange={(e) => setDropdownValue(e.target.value)}
+              onChange={(e) => onDropdownSelect(e)}
             >
               {options.map((ele, index) => (
                 <option key={`${index}${ele.value}`} value={ele.value}>
