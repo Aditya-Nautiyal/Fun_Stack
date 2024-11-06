@@ -13,7 +13,7 @@ export default function MemoryGame() {
 
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [itemCount, setItemCount] = useState(64);
+  const [itemCount, setItemCount] = useState(4);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
   const [options] = useState([
@@ -35,10 +35,15 @@ export default function MemoryGame() {
     if (footerRef.current) {
       setFooterHeight(footerRef.current.offsetHeight); // Set the height from the ref
     }
-    const res = Array.from({ length: itemCount }, (v, i) => ({
-      id: i,
-      visible: false, // Example: alternate visibility
-    }));
+    const res = Array.from({ length: itemCount }, (v, i) => {
+      // Calculate the pair index (0, 1 for the first pair, 2, 3 for the second pair, etc.)
+      const pairIndex = Math.floor(i / 2);
+      return {
+        id: i,
+        visible: false, // Example: alternate visibility
+        comparingValue: pairIndex, // Assign same comparingValue to two consecutive items
+      };
+    });
     setItems(res);
   }, [itemCount]);
 
@@ -60,6 +65,15 @@ export default function MemoryGame() {
     }
   };
 
+  const newGameButtonClicked = () => {
+    const res = Array.from({ length: itemCount }, (v, i) => ({
+      id: i,
+      visible: false, // Example: alternate visibility
+    }));
+    setItems(res);
+    setSelectedItems([]);
+  };
+
   const bodyStruture = () => {
     return (
       <div
@@ -78,9 +92,9 @@ export default function MemoryGame() {
               }`}
             >
               {/* Initial button content */}
-              <div className="front"/>
+              <div className="front" />
               {/* Content after flip */}
-              <div className="back">{ele.id}</div>
+              <div className="back">{ele.comparingValue}</div>
             </div>
           </div>
         ))}
@@ -93,7 +107,9 @@ export default function MemoryGame() {
         <div className="headerContent">
           <div className="mGameTitle">{FUN_STACK}</div>
           <div className="mGameHeaderButtonWrapper">
-            <button className="newButtonMGame">{NEW_GAME}</button>
+            <button className="newButtonMGame" onClick={newGameButtonClicked}>
+              {NEW_GAME}
+            </button>
             <select
               id="options"
               className="styled-select"
