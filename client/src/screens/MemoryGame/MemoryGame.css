@@ -43,7 +43,8 @@
   bottom: 0;
   width: 100%;
   color: black;
-  padding: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   text-align: center;
   z-index: 1;
   border: 1px solid red;
@@ -167,5 +168,13 @@
   .headerContent,
   .mGameHeaderButtonWrapper {
     flex-direction: column; /* Stacks the divs vertically */
+    gap: 2vh;
+  }
+  .mGameTitle{
+    padding-left: 0px;
+  }
+  .mGameHeaderButtonWrapper{
+    padding-right: 0px;
+    margin-top: 20px;
   }
 }

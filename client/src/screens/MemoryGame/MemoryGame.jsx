@@ -82,13 +82,16 @@ export default function MemoryGame() {
         id: i,
         visible: false, // Example: alternate visibility
         comparingValue: pairIndex, // Assign same comparingValue to two consecutive items
-        finalCheck: false
+        finalCheck: false,
       };
     });
   };
 
   const cirleClicked = (ele) => {
-    if (selectedItems.some((item) => item.id === ele.id) && ele.finalCheck === false) {
+    if (
+      selectedItems.some((item) => item.id === ele.id) &&
+      ele.finalCheck === false
+    ) {
       setSelectedItems(selectedItems.filter((item) => item.id !== ele.id));
       setItems((item) =>
         item.id === ele.id ? { ...item, visible: false } : item
@@ -107,6 +110,7 @@ export default function MemoryGame() {
     const res = shuffleArrayInPlace(itemsGeneration());
     setItems(res);
     setSelectedItems([]);
+    setCheckPairArray([]);
   };
 
   const onDropdownSelect = (e) => {
@@ -151,7 +155,6 @@ export default function MemoryGame() {
   };
   return (
     <div className="parentMGameWrapper">
-      {console.log("Selec- ", selectedItems)}
       <div className="header" ref={divRef}>
         <div className="headerContent">
           <div className="mGameTitle">{FUN_STACK}</div>
