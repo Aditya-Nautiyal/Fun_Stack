@@ -13,6 +13,8 @@ export default function MemoryGame() {
 
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [checkPairArray, setCheckPairArray] = useState([]);
+
   const [itemCount, setItemCount] = useState(4);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
@@ -43,6 +45,35 @@ export default function MemoryGame() {
     setItemCount(dropdownValue * dropdownValue);
   }, [dropdownValue]);
 
+  useEffect(() => {
+    if (
+      checkPairArray.length === 2 &&
+      checkPairArray[0] !== checkPairArray[1]
+    ) {
+      setTimeout(() => {
+        setSelectedItems(
+          selectedItems.filter(
+            (item) => !checkPairArray.includes(item.comparingValue)
+          )
+        );
+
+        setCheckPairArray([]);
+      }, 500);
+    } else if (
+      checkPairArray.length === 2 &&
+      checkPairArray[0] === checkPairArray[1]
+    ) {
+      setItems(
+        items.map((item) =>
+          checkPairArray.includes(item.comparingValue)
+            ? { ...item, finalCheck: true }
+            : item
+        )
+      );
+      setCheckPairArray([]);
+    }
+  }, [selectedItems, items]);
+
   const itemsGeneration = () => {
     return Array.from({ length: itemCount }, (v, i) => {
       // Calculate the pair index (0, 1 for the first pair, 2, 3 for the second pair, etc.)
@@ -51,21 +82,24 @@ export default function MemoryGame() {
         id: i,
         visible: false, // Example: alternate visibility
         comparingValue: pairIndex, // Assign same comparingValue to two consecutive items
+        finalCheck: false
       };
     });
   };
 
   const cirleClicked = (ele) => {
-    if (selectedItems.some((item) => item.id === ele.id)) {
+    if (selectedItems.some((item) => item.id === ele.id) && ele.finalCheck === false) {
       setSelectedItems(selectedItems.filter((item) => item.id !== ele.id));
       setItems((item) =>
         item.id === ele.id ? { ...item, visible: false } : item
       );
-    } else {
+      setCheckPairArray([]);
+    } else if (ele.finalCheck === false) {
       setSelectedItems([...selectedItems, ele]);
       setItems((item) =>
         item.id === ele.id ? { ...item, visible: true } : item
       );
+      setCheckPairArray([...checkPairArray, ele.comparingValue]);
     }
   };
 
@@ -77,7 +111,7 @@ export default function MemoryGame() {
 
   const onDropdownSelect = (e) => {
     newGameButtonClicked();
-    setDropdownValue(e.target.value)
+    setDropdownValue(e.target.value);
   };
 
   const shuffleArrayInPlace = (array) => {
@@ -87,7 +121,7 @@ export default function MemoryGame() {
     }
     return array;
   };
-  
+
   const bodyStruture = () => {
     return (
       <div
@@ -117,6 +151,7 @@ export default function MemoryGame() {
   };
   return (
     <div className="parentMGameWrapper">
+      {console.log("Selec- ", selectedItems)}
       <div className="header" ref={divRef}>
         <div className="headerContent">
           <div className="mGameTitle">{FUN_STACK}</div>
