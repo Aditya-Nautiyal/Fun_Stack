@@ -1,4 +1,6 @@
 import { useRef, useEffect, useState } from "react";
+import Timer from "../../components/timer/timer";
+import ConfettiExplosion from "react-confetti-explosion";
 import {
   FUN_STACK,
   NEW_GAME,
@@ -18,6 +20,13 @@ export default function MemoryGame() {
   const [itemCount, setItemCount] = useState(4);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
+  const [isRunning, setIsRunning] = useState(false);
+  const [timerValue, setTimerValue] = useState(null);
+  const [initialMinute, setInitialMinute] = useState(10);
+  const [initialSecond, setInitialSecond] = useState(0);
+  const [timerKey, setTimerKey] = useState(0);
+  const [isAllFlipped, setIsAllFlipped] = useState(false);
+
   const [options] = useState([
     {
       label: TOW_BY_TOW,
@@ -72,6 +81,10 @@ export default function MemoryGame() {
       );
       setCheckPairArray([]);
     }
+    const allFlipped = items.every((item) => item.finalCheck === true);
+    if (allFlipped && items.length > 0) {
+      setIsAllFlipped(true);
+    }
   }, [selectedItems, items]);
 
   const itemsGeneration = () => {
@@ -104,6 +117,7 @@ export default function MemoryGame() {
       );
       setCheckPairArray([...checkPairArray, ele.comparingValue]);
     }
+    setIsRunning(true);
   };
 
   const newGameButtonClicked = () => {
@@ -111,6 +125,11 @@ export default function MemoryGame() {
     setItems(res);
     setSelectedItems([]);
     setCheckPairArray([]);
+    setInitialMinute(10);
+    setInitialSecond(0);
+    setTimerKey((prevKey) => prevKey + 1); // Change key to remount Timer
+    setIsRunning(true);
+    setIsAllFlipped(false);
   };
 
   const onDropdownSelect = (e) => {
@@ -126,31 +145,41 @@ export default function MemoryGame() {
     return array;
   };
 
+  const handleTimerStop = (time) => {
+    setTimerValue(time); // Get the current timer value
+  };
+
   const bodyStruture = () => {
     return (
-      <div
-        className="gridBodyStructure"
-        style={{
-          gridTemplateColumns: `repeat(${Math.sqrt(items.length)}, 1fr)`,
-        }}
-      >
-        {items.map((ele, index) => (
-          <div key={`${index}${ele.id}`} onClick={() => cirleClicked(ele)}>
-            <div
-              className={`mGameCircle ${
-                selectedItems.some((item) => item.id === ele.id)
-                  ? "is-flipped"
-                  : ""
-              }`}
-            >
-              {/* Initial button content */}
-              <div className="front" />
-              {/* Content after flip */}
-              <div className="back">{ele.comparingValue}</div>
+      <>
+        {isAllFlipped ? (
+          <ConfettiExplosion className="confetti" />
+        ) : null}
+
+        <div
+          className="gridBodyStructure"
+          style={{
+            gridTemplateColumns: `repeat(${Math.sqrt(items.length)}, 1fr)`,
+          }}
+        >
+          {items.map((ele, index) => (
+            <div key={`${index}${ele.id}`} onClick={() => cirleClicked(ele)}>
+              <div
+                className={`mGameCircle ${
+                  selectedItems.some((item) => item.id === ele.id)
+                    ? "is-flipped"
+                    : ""
+                }`}
+              >
+                {/* Initial button content */}
+                <div className="front" />
+                {/* Content after flip */}
+                <div className="back">{ele.comparingValue}</div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </>
     );
   };
   return (
@@ -187,8 +216,17 @@ export default function MemoryGame() {
           <div className="circleBox">{bodyStruture()}</div>
         </div>
       </div>
-      <div className="footer" ref={footerRef}>
-        Footer
+
+      <div className="footer common-flex-box" ref={footerRef}>
+        {
+          <Timer
+            key={timerKey}
+            initialMinutes={initialMinute}
+            initialSeconds={initialSecond}
+            isRunning={isRunning}
+            onStop={() => handleTimerStop()}
+          />
+        }
       </div>
     </div>
   );
