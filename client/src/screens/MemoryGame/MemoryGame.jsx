@@ -21,11 +21,12 @@ export default function MemoryGame() {
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
   const [isRunning, setIsRunning] = useState(false);
-  const [timerValue, setTimerValue] = useState(null);
-  const [initialMinute, setInitialMinute] = useState(10);
+  const [initialMinute, setInitialMinute] = useState(5);
   const [initialSecond, setInitialSecond] = useState(0);
   const [timerKey, setTimerKey] = useState(0);
   const [isAllFlipped, setIsAllFlipped] = useState(false);
+
+  let timerStopValue = "";
 
   const [options] = useState([
     {
@@ -84,6 +85,7 @@ export default function MemoryGame() {
     const allFlipped = items.every((item) => item.finalCheck === true);
     if (allFlipped && items.length > 0) {
       setIsAllFlipped(true);
+      setIsRunning(false)
     }
   }, [selectedItems, items]);
 
@@ -125,10 +127,10 @@ export default function MemoryGame() {
     setItems(res);
     setSelectedItems([]);
     setCheckPairArray([]);
-    setInitialMinute(10);
+    setInitialMinute(5);
     setInitialSecond(0);
     setTimerKey((prevKey) => prevKey + 1); // Change key to remount Timer
-    setIsRunning(true);
+    setIsRunning(false);
     setIsAllFlipped(false);
   };
 
@@ -146,15 +148,13 @@ export default function MemoryGame() {
   };
 
   const handleTimerStop = (time) => {
-    setTimerValue(time); // Get the current timer value
+    timerStopValue = time;
   };
 
   const bodyStruture = () => {
     return (
       <>
-        {isAllFlipped ? (
-          <ConfettiExplosion className="confetti" />
-        ) : null}
+        {isAllFlipped ? <ConfettiExplosion className="confetti" /> : null}
 
         <div
           className="gridBodyStructure"
@@ -212,19 +212,25 @@ export default function MemoryGame() {
           paddingBottom: `${footerHeight}px`,
         }}
       >
-        <div className="common-flex-box" style={{ height: "100%" }}>
+        <div
+          className="common-flex-box"
+          style={{ height: "100%", caretColor: "transparent" }}
+        >
           <div className="circleBox">{bodyStruture()}</div>
         </div>
       </div>
-
-      <div className="footer common-flex-box" ref={footerRef}>
+      <div className={"footer common-flex-box"} ref={footerRef}>
         {
           <Timer
             key={timerKey}
             initialMinutes={initialMinute}
             initialSeconds={initialSecond}
             isRunning={isRunning}
-            onStop={() => handleTimerStop()}
+            onStop={(e) => {
+              if (isAllFlipped) {
+                handleTimerStop(e);
+              }
+            }}
           />
         }
       </div>
