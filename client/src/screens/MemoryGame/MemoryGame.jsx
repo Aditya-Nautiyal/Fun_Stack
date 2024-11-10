@@ -9,6 +9,10 @@ import {
 } from "../../constants/string";
 import "./MemoryGame.css";
 
+const INITIAL_MINUTES = 5;
+const INITIAL_SECONDS = 0;
+
+
 export default function MemoryGame() {
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
@@ -21,8 +25,8 @@ export default function MemoryGame() {
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
   const [isRunning, setIsRunning] = useState(false);
-  const [initialMinute, setInitialMinute] = useState(5);
-  const [initialSecond, setInitialSecond] = useState(0);
+  const [initialMinute, setInitialMinute] = useState(INITIAL_MINUTES);
+  const [initialSecond, setInitialSecond] = useState(INITIAL_SECONDS);
   const [timerKey, setTimerKey] = useState(0);
   const [isAllFlipped, setIsAllFlipped] = useState(false);
   const [stoppageTime, setStoppageTime] = useState("");
@@ -39,6 +43,7 @@ export default function MemoryGame() {
   ]);
   const [dropdownValue, setDropdownValue] = useState(2); // State to store the height
 
+  
   useEffect(() => {
     if (divRef.current) {
       setHeaderHeight(divRef.current.offsetHeight); // Set the height from the ref
@@ -126,8 +131,8 @@ export default function MemoryGame() {
     setItems(res);
     setSelectedItems([]);
     setCheckPairArray([]);
-    setInitialMinute(5);
-    setInitialSecond(0);
+    setInitialMinute(INITIAL_MINUTES);
+    setInitialSecond(INITIAL_SECONDS);
     setTimerKey((prevKey) => prevKey + 1); // Change key to remount Timer
     setIsRunning(false);
     setIsAllFlipped(false);
@@ -227,6 +232,8 @@ export default function MemoryGame() {
             initialSeconds={initialSecond}
             isRunning={isRunning}
             onStop={handleTimerStop}
+            minimumMinute = {0}
+            minimumSeconds = {30}
           />
         }
       </div>

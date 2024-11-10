@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { CHARCOAL } from "../../constants/color";
 import "./Timer.css"
 
 const Timer = ({
@@ -7,11 +8,12 @@ const Timer = ({
   initialSeconds = 0,
   isRunning,
   onStop,
+  minimumMinute = 0,
+  minimumSeconds = 0,
 }) => {
   const [minutes, setMinutes] = useState(initialMinutes);
   const [seconds, setSeconds] = useState(initialSeconds);
 
-    
   useEffect(() => {
     let timerInterval = null;
 
@@ -29,7 +31,7 @@ const Timer = ({
         }
       }, 1000);
     }
-    
+
     return () => clearInterval(timerInterval);
   }, [isRunning, minutes, seconds]);
 
@@ -43,7 +45,15 @@ const Timer = ({
   const formatTime = (time) => (time < 10 ? `0${time}` : time);
 
   return (
-    <div className="timer-display">
+    <div
+      className="timer-display"
+      style={{
+        color:
+          minutes <= minimumMinute && seconds <= minimumSeconds
+            ? "red"
+            : CHARCOAL,
+      }}
+    >
       {formatTime(minutes)}:{formatTime(seconds)}
     </div>
   );
@@ -56,4 +66,6 @@ Timer.propTypes = {
   initialSeconds: PropTypes.number,
   isRunning: PropTypes.bool,
   onStop: PropTypes.func,
+  minimumMinute: PropTypes.number,
+  minimumSeconds: PropTypes.number
 };
