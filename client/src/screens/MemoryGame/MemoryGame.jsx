@@ -25,8 +25,7 @@ export default function MemoryGame() {
   const [initialSecond, setInitialSecond] = useState(0);
   const [timerKey, setTimerKey] = useState(0);
   const [isAllFlipped, setIsAllFlipped] = useState(false);
-
-  let timerStopValue = "";
+  const [stoppageTime, setStoppageTime] = useState("");
 
   const [options] = useState([
     {
@@ -148,7 +147,8 @@ export default function MemoryGame() {
   };
 
   const handleTimerStop = (time) => {
-    timerStopValue = time;
+    console.log(time)
+    setStoppageTime(time);
   };
 
   const bodyStruture = () => {
@@ -226,11 +226,7 @@ export default function MemoryGame() {
             initialMinutes={initialMinute}
             initialSeconds={initialSecond}
             isRunning={isRunning}
-            onStop={(e) => {
-              if (isAllFlipped) {
-                handleTimerStop(e);
-              }
-            }}
+            onStop={handleTimerStop}
           />
         }
       </div>

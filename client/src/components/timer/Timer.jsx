@@ -29,7 +29,7 @@ const Timer = ({
         }
       }, 1000);
     }
-
+    
     return () => clearInterval(timerInterval);
   }, [isRunning, minutes, seconds]);
 
@@ -38,7 +38,7 @@ const Timer = ({
     if (!isRunning) {
       onStop({ minutes, seconds });
     }
-  }, [isRunning, minutes, seconds, onStop]);
+  }, [isRunning]);
 
   const formatTime = (time) => (time < 10 ? `0${time}` : time);
 
