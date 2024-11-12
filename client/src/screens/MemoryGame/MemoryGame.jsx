@@ -6,8 +6,10 @@ import {
   NEW_GAME,
   TOW_BY_TOW,
   FOUR_BY_FOUR,
+  TOP_SCORE,
 } from "../../constants/string";
 import "./MemoryGame.css";
+import Overlay from "../../components/overlay/Overlay";
 
 const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
@@ -29,6 +31,7 @@ export default function MemoryGame() {
   const [timerKey, setTimerKey] = useState(0);
   const [isAllFlipped, setIsAllFlipped] = useState(false);
   const [stoppageTime, setStoppageTime] = useState("");
+  const [isOverlayOpen, setOverlayOpen] = useState(false);
 
   const [options] = useState([
     {
@@ -153,6 +156,10 @@ export default function MemoryGame() {
     setStoppageTime(time);
   };
 
+  const toggleOverlay = () => {
+    setOverlayOpen(!isOverlayOpen);
+  };
+
   const bodyStruture = () => {
     return (
       <>
@@ -221,7 +228,11 @@ export default function MemoryGame() {
           <div className="circleBox">{bodyStruture()}</div>
         </div>
       </div>
-      <div className={"footer common-flex-box"} style={{ gap:"30px"}} ref={footerRef}>
+      <div
+        className={"footer common-flex-box"}
+        style={{ gap: "30px" }}
+        ref={footerRef}
+      >
         <Timer
           key={timerKey}
           initialMinutes={initialMinute}
@@ -231,8 +242,11 @@ export default function MemoryGame() {
           minimumMinute={0}
           minimumSeconds={30}
         />
-        <div className="topScore-container">Top Score</div>
+        <div className="topScore-container" onClick={toggleOverlay}>
+          {TOP_SCORE}
+        </div>
       </div>
+      {isOverlayOpen && <Overlay onClose={toggleOverlay} />}
     </div>
   );
 }
