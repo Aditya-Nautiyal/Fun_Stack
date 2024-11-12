@@ -12,7 +12,6 @@ import "./MemoryGame.css";
 const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
 
-
 export default function MemoryGame() {
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
@@ -43,7 +42,6 @@ export default function MemoryGame() {
   ]);
   const [dropdownValue, setDropdownValue] = useState(2); // State to store the height
 
-  
   useEffect(() => {
     if (divRef.current) {
       setHeaderHeight(divRef.current.offsetHeight); // Set the height from the ref
@@ -89,7 +87,7 @@ export default function MemoryGame() {
     const allFlipped = items.every((item) => item.finalCheck === true);
     if (allFlipped && items.length > 0) {
       setIsAllFlipped(true);
-      setIsRunning(false)
+      setIsRunning(false);
     }
   }, [selectedItems, items]);
 
@@ -152,7 +150,6 @@ export default function MemoryGame() {
   };
 
   const handleTimerStop = (time) => {
-    console.log(time)
     setStoppageTime(time);
   };
 
@@ -224,18 +221,17 @@ export default function MemoryGame() {
           <div className="circleBox">{bodyStruture()}</div>
         </div>
       </div>
-      <div className={"footer common-flex-box"} ref={footerRef}>
-        {
-          <Timer
-            key={timerKey}
-            initialMinutes={initialMinute}
-            initialSeconds={initialSecond}
-            isRunning={isRunning}
-            onStop={handleTimerStop}
-            minimumMinute = {0}
-            minimumSeconds = {30}
-          />
-        }
+      <div className={"footer common-flex-box"} style={{ gap:"30px"}} ref={footerRef}>
+        <Timer
+          key={timerKey}
+          initialMinutes={initialMinute}
+          initialSeconds={initialSecond}
+          isRunning={isRunning}
+          onStop={handleTimerStop}
+          minimumMinute={0}
+          minimumSeconds={30}
+        />
+        <div className="topScore-container">Top Score</div>
       </div>
     </div>
   );

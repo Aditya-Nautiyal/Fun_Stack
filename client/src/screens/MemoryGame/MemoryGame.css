@@ -77,6 +77,7 @@
   border-radius: 20px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s ease; /* Smooth transition */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
 }
 
 .newButtonMGame:hover {
@@ -167,6 +168,24 @@
   position: absolute;
   top: 50%;
   left: 50%;
+}
+
+.topScore-container {
+  font-family: cursive;
+  font-weight: bold;
+  font-size: 14px;
+  color: white; /* Dark text color */
+  background-color: #ffa500; /* Light gray background */
+  padding: 11.5px;
+  border-radius: 10px;
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition */
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.topScore-container:hover {
+  background-color: #e69500; /* Slightly darker shade on hover */
 }
 
 /* Media query for small screens */
