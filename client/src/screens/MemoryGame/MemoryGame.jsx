@@ -13,8 +13,15 @@ import {
   SIX_BY_SIX,
   TOP_SCORE,
 } from "../../constants/string";
+import {
+  GENERIC_FAILIURE,
+  GENERIC_SUCCESS,
+  SUCCESS,
+} from "../../constants/codes.jsx";
 import "./MemoryGame.css";
 import Overlay from "../../components/overlay/Overlay";
+import { toast } from "react-toastify";
+import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
 const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
@@ -213,9 +220,12 @@ export default function MemoryGame() {
 
   const submitScoreApi = async () => {
     const score = String((stoppageTime?.minutes * 60) + stoppageTime?.seconds);
-    const res = await submitScore(
+    const result = await submitScore(
       urlGenerator("submitScore"), { email : emailFromProps, score }
     );
+    if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
+      toast.success(result?.data?.desc, ToastMsgStructure); 
+    }
 
   };
 
