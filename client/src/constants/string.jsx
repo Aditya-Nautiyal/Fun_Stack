@@ -17,6 +17,7 @@ export const FUN_STACK = "Fun Stack";
 export const NEW_GAME = "New game";
 export const TOW_BY_TOW = "2 * 2";
 export const FOUR_BY_FOUR = "4 * 4";
+export const SIX_BY_SIX = "6 * 6";
 export const TOP_SCORE = "Top Score";
 
 

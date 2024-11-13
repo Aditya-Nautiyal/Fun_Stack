@@ -4,8 +4,8 @@ import ConfettiExplosion from "react-confetti-explosion";
 import {
   FUN_STACK,
   NEW_GAME,
-  TOW_BY_TOW,
   FOUR_BY_FOUR,
+  SIX_BY_SIX,
   TOP_SCORE,
 } from "../../constants/string";
 import "./MemoryGame.css";
@@ -22,7 +22,7 @@ export default function MemoryGame() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [checkPairArray, setCheckPairArray] = useState([]);
 
-  const [itemCount, setItemCount] = useState(4);
+  const [itemCount, setItemCount] = useState(16);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
   const [isRunning, setIsRunning] = useState(false);
@@ -35,15 +35,15 @@ export default function MemoryGame() {
 
   const [options] = useState([
     {
-      label: TOW_BY_TOW,
-      value: 2,
-    },
-    {
       label: FOUR_BY_FOUR,
       value: 4,
     },
+    {
+      label: SIX_BY_SIX,
+      value: 6,
+    },
   ]);
-  const [dropdownValue, setDropdownValue] = useState(2); // State to store the height
+  const [dropdownValue, setDropdownValue] = useState(4); // State to store the height
 
   useEffect(() => {
     if (divRef.current) {
