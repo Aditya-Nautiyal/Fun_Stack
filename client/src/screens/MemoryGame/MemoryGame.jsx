@@ -1,6 +1,11 @@
 import { useRef, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Timer from "../../components/timer/timer";
 import ConfettiExplosion from "react-confetti-explosion";
+import {
+  submitScore,
+  urlGenerator,
+} from "../../services/apiCall.tsx";
 import {
   FUN_STACK,
   NEW_GAME,
@@ -15,6 +20,9 @@ const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
 
 export default function MemoryGame() {
+  const location = useLocation();
+  const { emailFromProps } = location.state || {}; 
+  
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
 
@@ -22,7 +30,7 @@ export default function MemoryGame() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [checkPairArray, setCheckPairArray] = useState([]);
 
-  const [itemCount, setItemCount] = useState(16);
+  const [itemCount, setItemCount] = useState(4);
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the height
   const [footerHeight, setFooterHeight] = useState(0); // State to store the height
   const [isRunning, setIsRunning] = useState(false);
@@ -36,6 +44,10 @@ export default function MemoryGame() {
   const [options] = useState([
     {
       label: FOUR_BY_FOUR,
+      value: 2,
+    },
+    {
+      label: FOUR_BY_FOUR,
       value: 4,
     },
     {
@@ -43,7 +55,7 @@ export default function MemoryGame() {
       value: 6,
     },
   ]);
-  const [dropdownValue, setDropdownValue] = useState(4); // State to store the height
+  const [dropdownValue, setDropdownValue] = useState(2); // State to store the height
 
   useEffect(() => {
     if (divRef.current) {
@@ -91,8 +103,15 @@ export default function MemoryGame() {
     if (allFlipped && items.length > 0) {
       setIsAllFlipped(true);
       setIsRunning(false);
+      
     }
   }, [selectedItems, items]);
+
+  useEffect(() => {
+    if (isAllFlipped) {
+      submitScoreApi();
+    }
+  }, [stoppageTime]);
 
   const itemsGeneration = () => {
     return Array.from({ length: itemCount }, (v, i) => {
@@ -191,6 +210,15 @@ export default function MemoryGame() {
       </>
     );
   };
+
+  const submitScoreApi = async () => {
+    const score = String((stoppageTime?.minutes * 60) + stoppageTime?.seconds);
+    const res = await submitScore(
+      urlGenerator("submitScore"), { email : emailFromProps, score }
+    );
+
+  };
+
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>

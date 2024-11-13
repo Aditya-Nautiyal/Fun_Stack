@@ -2,7 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
 const EmployeeModel = require("./models/Employee.js");
+const ScoreModel = require("./models/Score.js")
+
 const {
   REGISTRATION_SUCCESS,
   USER_EXISTED,
@@ -91,7 +94,7 @@ app.post("/register", (req, res) => {
   EmployeeModel.findOne({ email: email })
     .then((user) => {
       if (user) {
-        res.json({
+        return res.json({
           statusCode: DEFAULT_ERROR,
           desc: USER_EXISTED,
         });
@@ -107,6 +110,45 @@ app.post("/register", (req, res) => {
       }
     })
     .catch((err) => res.json(err));
+});
+
+app.post("/submitScore", async(req, res) => {
+  const { email, score } = req.body;
+
+  try {
+    // Fetch all scores for the provided email
+    const userScores = await ScoreModel.find({ email }).sort({ score: -1 }); // Sort descending by score
+
+    if (userScores.length < 10) {
+      // If less than 10 scores, add the new score
+      const newScore = new ScoreModel({ email, score });
+      await newScore.save();
+      return res.json({
+        statusCode: DEFAULT_SUCCESS,
+        desc: "Congratulation, you made it to top 10",
+      });
+    }
+
+    // Check if the score is in the top 10
+    const lowestTopScore = Number(userScores[9].score); // Lowest score among the top 10
+
+    if (numericScore > lowestTopScore) {
+      // If new score qualifies, remove the lowest score and add the new one
+      await ScoreModel.findOneAndDelete({ _id: userScores[9]._id });
+      const newScore = new ScoreModel({ email, score });
+      await newScore.save();
+      return res.json({
+        statusCode: DEFAULT_SUCCESS,
+        desc: "Congratulation, you made it to top 10",
+      });
+    } 
+  } catch (error) {
+    console.error(error);
+    return res.json({
+      statusCode: DEFAULT_ERROR,
+      desc: "Internal server error",
+    });
+  }
 });
 
 app.use(express.static("../client/dist"));

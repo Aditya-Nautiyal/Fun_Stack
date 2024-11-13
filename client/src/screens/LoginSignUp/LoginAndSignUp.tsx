@@ -84,7 +84,7 @@ function LoginAndSignUp() {
     });
     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
       toast.success(result?.data?.desc, ToastMsgStructure);
-      navigate(MemoryGame);
+      navigate(MemoryGame, { state: { emailFromProps: email } });
     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
       toast.error(result?.data?.desc, ToastMsgStructure);
     } else {
