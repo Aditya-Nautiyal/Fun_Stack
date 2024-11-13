@@ -131,7 +131,7 @@ app.post("/submitScore", async(req, res) => {
 
     // Check if the score is in the top 10
     const lowestTopScore = Number(userScores[9].score); // Lowest score among the top 10
-
+    const numericScore = Number(score);
     if (numericScore > lowestTopScore) {
       // If new score qualifies, remove the lowest score and add the new one
       await ScoreModel.findOneAndDelete({ _id: userScores[9]._id });
