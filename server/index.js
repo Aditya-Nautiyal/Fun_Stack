@@ -164,7 +164,7 @@ app.post("/getHighScore", async (req, res) => {
   const { matrixSize } = req.body;
   try {
     const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
-    const users = await Model.find({});
+    const users = await Model.find({}).select("email score -_id");
     return res.json({
       statusCode: DEFAULT_SUCCESS,
       list: users,

@@ -48,6 +48,7 @@ export default function MemoryGame() {
   const [isAllFlipped, setIsAllFlipped] = useState(false);
   const [stoppageTime, setStoppageTime] = useState("");
   const [isOverlayOpen, setOverlayOpen] = useState(false);
+  const [highScoreList, setHighScoreList] = useState([]);
 
   const [options] = useState([
     {
@@ -182,8 +183,9 @@ export default function MemoryGame() {
   const toggleOverlay = () => {
     if (!isOverlayOpen) {
       getHighScore();
+    } else {
+      setOverlayOpen(!isOverlayOpen);
     }
-    setOverlayOpen(!isOverlayOpen);
   };
 
   const bodyStruture = () => {
@@ -226,7 +228,11 @@ export default function MemoryGame() {
       matrixSize: String(dropdownValue),
     });
     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
-      toast.success(result?.data?.desc, ToastMsgStructure); 
+      toast.success(result?.data?.desc, ToastMsgStructure);
+    } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
+      toast.error(result?.data?.desc, ToastMsgStructure);
+    } else {
+      toast.error("Error...", ToastMsgStructure);
     }
 
   };
@@ -237,7 +243,12 @@ export default function MemoryGame() {
      });
      if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
        //  toast.success(result?.data?.desc, ToastMsgStructure);/
-       console.log("44424", result)
+       setOverlayOpen(!isOverlayOpen);
+       setHighScoreList(result?.list);
+     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
+       toast.error(result?.data?.desc, ToastMsgStructure);
+     } else {
+       toast.error("Error...", ToastMsgStructure);
      }
   };
   
