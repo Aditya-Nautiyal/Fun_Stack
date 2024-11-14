@@ -6,6 +6,10 @@ const LOGIN_SUCCESS = "Login success";
 const SERVER_RUNING = "Server is running";
 const PASSWORD_CRITERIA_NOT_MEET = "Password does not meet the criteria";
 const EMAIL_CRITERIA_NOT_MEET = "Email does not meet the criteria";
+const CONGRATULATIONS_HIGH_SCORE = "Congratulation, you made it to top 10";
+const CONGRATULATIONS = "Congratulation";
+const INTERNAL_SERVER_ERROR = "Internal server error";
+
 
 
 module.exports = {
@@ -17,5 +21,8 @@ module.exports = {
   SERVER_RUNING,
   PASSWORD_CRITERIA_NOT_MEET,
   EMAIL_CRITERIA_NOT_MEET,
+  CONGRATULATIONS_HIGH_SCORE,
+  CONGRATULATIONS,
+  INTERNAL_SERVER_ERROR,
 };
 

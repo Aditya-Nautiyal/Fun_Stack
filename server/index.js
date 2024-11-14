@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const EmployeeModel = require("./models/Employee.js");
-const ScoreModel = require("./models/Score.js")
+const ScoreModelForFour = require("./models/ScoreForFour.js");
+const ScoreModelForSix = require("./models/ScoreForSix.js");
 
 const {
   REGISTRATION_SUCCESS,
@@ -15,6 +16,9 @@ const {
   SERVER_RUNING,
   EMAIL_CRITERIA_NOT_MEET,
   PASSWORD_CRITERIA_NOT_MEET,
+  CONGRATULATIONS_HIGH_SCORE,
+  CONGRATULATIONS,
+  INTERNAL_SERVER_ERROR,
 } = require("./constants/string.js");
 const { DEFAULT_SUCCESS, DEFAULT_ERROR } = require("./constants/codes.js");
 const {
@@ -112,20 +116,20 @@ app.post("/register", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-app.post("/submitScore", async(req, res) => {
-  const { email, score } = req.body;
-
+app.post("/submitScore", async (req, res) => {
+  const { email, score, matrixSize } = req.body;
   try {
+    const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
     // Fetch all scores for the provided email
-    const userScores = await ScoreModel.find({ email }).sort({ score: -1 }); // Sort descending by score
+    const userScores = await Model.find({ email }).sort({ score: -1 }); // Sort descending by score
 
     if (userScores.length < 10) {
       // If less than 10 scores, add the new score
-      const newScore = new ScoreModel({ email, score });
+      const newScore = new Model({ email, score });
       await newScore.save();
       return res.json({
         statusCode: DEFAULT_SUCCESS,
-        desc: "Congratulation, you made it to top 10",
+        desc: CONGRATULATIONS_HIGH_SCORE,
       });
     }
 
@@ -134,19 +138,41 @@ app.post("/submitScore", async(req, res) => {
     const numericScore = Number(score);
     if (numericScore > lowestTopScore) {
       // If new score qualifies, remove the lowest score and add the new one
-      await ScoreModel.findOneAndDelete({ _id: userScores[9]._id });
-      const newScore = new ScoreModel({ email, score });
+      await Model.findOneAndDelete({ _id: userScores[9]._id });
+      const newScore = new Model({ email, score });
       await newScore.save();
       return res.json({
         statusCode: DEFAULT_SUCCESS,
-        desc: "Congratulation, you made it to top 10",
+        desc: CONGRATULATIONS_HIGH_SCORE,
       });
-    } 
+    } else {
+      return res.json({
+        statusCode: DEFAULT_SUCCESS,
+        desc: CONGRATULATIONS,
+      });
+    }
   } catch (error) {
     console.error(error);
     return res.json({
       statusCode: DEFAULT_ERROR,
-      desc: "Internal server error",
+      desc: INTERNAL_SERVER_ERROR,
+    });
+  }
+});
+
+app.post("/getHighScore", async (req, res) => {
+  const { matrixSize } = req.body;
+  try {
+    const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
+    const users = await Model.find({});
+    return res.json({
+      statusCode: DEFAULT_SUCCESS,
+      list: users,
+    });
+  } catch (error) {
+    return res.json({
+      statusCode: DEFAULT_ERROR,
+      desc: INTERNAL_SERVER_ERROR,
     });
   }
 });

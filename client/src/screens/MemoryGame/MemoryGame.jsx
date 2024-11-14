@@ -4,6 +4,7 @@ import Timer from "../../components/timer/timer";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
   submitScore,
+  fetchHighScore,
   urlGenerator,
 } from "../../services/apiCall.tsx";
 import {
@@ -51,10 +52,6 @@ export default function MemoryGame() {
   const [options] = useState([
     {
       label: FOUR_BY_FOUR,
-      value: 2,
-    },
-    {
-      label: FOUR_BY_FOUR,
       value: 4,
     },
     {
@@ -62,7 +59,7 @@ export default function MemoryGame() {
       value: 6,
     },
   ]);
-  const [dropdownValue, setDropdownValue] = useState(2); // State to store the height
+  const [dropdownValue, setDropdownValue] = useState(4); // State to store the height
 
   useEffect(() => {
     if (divRef.current) {
@@ -183,6 +180,9 @@ export default function MemoryGame() {
   };
 
   const toggleOverlay = () => {
+    if (!isOverlayOpen) {
+      getHighScore();
+    }
     setOverlayOpen(!isOverlayOpen);
   };
 
@@ -220,15 +220,27 @@ export default function MemoryGame() {
 
   const submitScoreApi = async () => {
     const score = String((stoppageTime?.minutes * 60) + stoppageTime?.seconds);
-    const result = await submitScore(
-      urlGenerator("submitScore"), { email : emailFromProps, score }
-    );
+    const result = await submitScore(urlGenerator("submitScore"), {
+      email: emailFromProps,
+      score,
+      matrixSize: String(dropdownValue),
+    });
     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
       toast.success(result?.data?.desc, ToastMsgStructure); 
     }
 
   };
 
+   const getHighScore = async () => {
+     const result = await fetchHighScore(urlGenerator("getHighScore"), {
+       matrixSize: String(dropdownValue),
+     });
+     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
+       //  toast.success(result?.data?.desc, ToastMsgStructure);/
+       console.log("44424", result)
+     }
+  };
+  
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>

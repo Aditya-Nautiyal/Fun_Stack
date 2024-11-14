@@ -28,4 +28,13 @@ export const submitScore = async (url: string, body: any) => {
   }
 };
 
+export const fetchHighScore = async (url: string, body: any) => {
+  try {
+    const result = await axios.post(url, { ...body });
+    return result;
+  } catch (err) {
+    return err;
+  }
+};
+
 export const urlGenerator = (endURL: string) => `${API_BASE_URL}${endURL}`;
