@@ -8,8 +8,8 @@ export default function Overlay({
   buttonTitle,
 }) {
   return (
-    <div className="overlay">
-      <div className="overlay-content">
+    <div className="overlay" onClick={onClose}>
+      <div className="overlay-content" onClick={(event) => event.stopPropagation()}>
         <div className="overlay-title">{headerTitle}</div>
         <div className="overlay-body">{content}</div>
         <button className="overlay-button" onClick={onClose}>

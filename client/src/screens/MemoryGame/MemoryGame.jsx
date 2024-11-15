@@ -269,7 +269,7 @@ export default function MemoryGame() {
                 }`}
               >
                 <div className="overlay-table-column1">{ele.email}</div>
-                <div className="overlay-table-column2">{ele.score}</div>
+                <div className="overlay-table-column2">{scoreFormatter(ele.score)}</div>
               </div>
               <SpaceFiller margin="5px" />
             </div>
@@ -279,6 +279,12 @@ export default function MemoryGame() {
       );
     }
     return null;
+  };
+
+  const scoreFormatter = (seconds) => {
+    const minutes = Math.floor(seconds / 60); // Get the minutes
+    const remainingSeconds = seconds % 60; // Get the remaining seconds
+    return  `${minutes} min ${remainingSeconds < 10 ? '0' : ''}${remainingSeconds} sec`;
   };
 
   return (
