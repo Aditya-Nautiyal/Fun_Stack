@@ -182,12 +182,33 @@
   transition: background-color 0.3s ease; /* Smooth transition */
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  caret-color: transparent;
 }
 
 .topScore-container:hover {
   background-color: #e69500; /* Slightly darker shade on hover */
 }
 
+.overlay-content-table{
+  display: flex;
+  flex: 1;
+}
+
+.overlay-table-header1, .overlay-table-header2, .overlay-table-column1, .overlay-table-column2{
+  flex: 0.5;
+  font-family: cursive;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333; /* Dark color for text */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+.overlay-table-column1, .overlay-table-column2{
+  font-family: cursive;
+  font-size: 14px;
+  font-weight: 400;
+  
+}
 /* Media query for small screens */
 @media (max-width: 768px) {
   .headerContent,

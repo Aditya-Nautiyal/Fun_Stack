@@ -1,12 +1,20 @@
-import "./Overlay.css"
+import "./Overlay.css";
 import PropTypes from "prop-types";
 
-export default function Overlay({content="", onClose}) {
+export default function Overlay({
+  content,
+  onClose,
+  headerTitle,
+  buttonTitle,
+}) {
   return (
     <div className="overlay">
       <div className="overlay-content">
-        {content}
-        <button onClick={onClose}>Close</button>
+        <div className="overlay-title">{headerTitle}</div>
+        <div className="overlay-body">{content}</div>
+        <button className="overlay-button" onClick={onClose}>
+          {buttonTitle}
+        </button>
       </div>
     </div>
   );
@@ -14,5 +22,7 @@ export default function Overlay({content="", onClose}) {
 
 Overlay.propTypes = {
   content: PropTypes.element,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  buttonTitle: PropTypes.string,
+  headerTitle: PropTypes.string,
 };

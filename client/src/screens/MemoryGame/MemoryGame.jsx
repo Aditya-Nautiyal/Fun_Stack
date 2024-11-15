@@ -21,6 +21,7 @@ import {
 } from "../../constants/codes.jsx";
 import "./MemoryGame.css";
 import Overlay from "../../components/overlay/Overlay";
+import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import { toast } from "react-toastify";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
@@ -29,8 +30,8 @@ const INITIAL_SECONDS = 0;
 
 export default function MemoryGame() {
   const location = useLocation();
-  const { emailFromProps } = location.state || {}; 
-  
+  const { emailFromProps } = location.state || {};
+
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
 
@@ -108,7 +109,6 @@ export default function MemoryGame() {
     if (allFlipped && items.length > 0) {
       setIsAllFlipped(true);
       setIsRunning(false);
-      
     }
   }, [selectedItems, items]);
 
@@ -221,7 +221,7 @@ export default function MemoryGame() {
   };
 
   const submitScoreApi = async () => {
-    const score = String((stoppageTime?.minutes * 60) + stoppageTime?.seconds);
+    const score = String(stoppageTime?.minutes * 60 + stoppageTime?.seconds);
     const result = await submitScore(urlGenerator("submitScore"), {
       email: emailFromProps,
       score,
@@ -234,24 +234,49 @@ export default function MemoryGame() {
     } else {
       toast.error("Error...", ToastMsgStructure);
     }
-
   };
 
-   const getHighScore = async () => {
-     const result = await fetchHighScore(urlGenerator("getHighScore"), {
-       matrixSize: String(dropdownValue),
-     });
-     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
-       //  toast.success(result?.data?.desc, ToastMsgStructure);/
-       setOverlayOpen(!isOverlayOpen);
-       setHighScoreList(result?.list);
-     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
-       toast.error(result?.data?.desc, ToastMsgStructure);
-     } else {
-       toast.error("Error...", ToastMsgStructure);
-     }
+  const getHighScore = async () => {
+    const result = await fetchHighScore(urlGenerator("getHighScore"), {
+      matrixSize: String(dropdownValue),
+    });
+    if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
+      //  toast.success(result?.data?.desc, ToastMsgStructure);/
+      setHighScoreList(result?.data?.list);
+      setOverlayOpen(!isOverlayOpen);
+    } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
+      toast.error(result?.data?.desc, ToastMsgStructure);
+    } else {
+      toast.error("Error...", ToastMsgStructure);
+    }
   };
-  
+
+  const overlayContent = () => {
+    if (highScoreList.length > 0) {
+      return (
+        <>
+          <SpaceFiller margin="20px" />
+          <div className="overlay-content-table">
+            <div className="overlay-table-header1">EMAIL</div>
+            <div className="overlay-table-header2">SCORE</div>
+          </div>
+          <SpaceFiller margin="20px" />
+          {highScoreList.map((ele, i) => (
+            <div key={`${i}_${ele.score}`}>
+              <div className="overlay-content-table">
+                <div className="overlay-table-column1">{ele.email}</div>
+                <div className="overlay-table-column2">{ele.score}</div>
+              </div>
+              <SpaceFiller margin="5px" />
+            </div>
+          ))}
+          <SpaceFiller margin="20px" />
+        </>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>
@@ -307,7 +332,14 @@ export default function MemoryGame() {
           {TOP_SCORE}
         </div>
       </div>
-      {isOverlayOpen && <Overlay onClose={toggleOverlay} />}
+      {isOverlayOpen && (
+        <Overlay
+          headerTitle="TOP SCORE"
+          buttonTitle="Close"
+          content={overlayContent()}
+          onClose={toggleOverlay}
+        />
+      )}
     </div>
   );
 }
