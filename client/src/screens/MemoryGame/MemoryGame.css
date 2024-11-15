@@ -28,7 +28,6 @@
   width: 100%;
   color: white;
   z-index: 1;
-  border: 1px solid black;
   padding-top: 10px;
   padding-bottom: 10px;
 }
@@ -46,7 +45,6 @@
   padding-top: 20px;
   padding-bottom: 20px;
   z-index: 1;
-  border: 1px solid red;
 }
 
 .headerContent {
@@ -192,6 +190,12 @@
 .overlay-content-table{
   display: flex;
   flex: 1;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.grey-backgroud{
+  background-color: #E0E0E0;
 }
 
 .overlay-table-header1, .overlay-table-header2, .overlay-table-column1, .overlay-table-column2{

@@ -263,7 +263,11 @@ export default function MemoryGame() {
           <SpaceFiller margin="20px" />
           {highScoreList.map((ele, i) => (
             <div key={`${i}_${ele.score}`}>
-              <div className="overlay-content-table">
+              <div
+                className={`overlay-content-table ${
+                  i % 2 === 0 ? "grey-backgroud" : ""
+                }`}
+              >
                 <div className="overlay-table-column1">{ele.email}</div>
                 <div className="overlay-table-column2">{ele.score}</div>
               </div>
