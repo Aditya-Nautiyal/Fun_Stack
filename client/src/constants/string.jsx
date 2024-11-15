@@ -19,6 +19,10 @@ export const TOW_BY_TOW = "2 * 2";
 export const FOUR_BY_FOUR = "4 * 4";
 export const SIX_BY_SIX = "6 * 6";
 export const TOP_SCORE = "Top Score";
+export const EMAIL_CAPS = "EMAIL";
+export const SCORE_CAPS = "SCORE";
+export const CLOSE = "CLose";
+export const TOP_SCORE_CAPS = "TOP SCORE";
 
 
 

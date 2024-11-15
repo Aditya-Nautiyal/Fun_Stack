@@ -13,11 +13,14 @@ import {
   FOUR_BY_FOUR,
   SIX_BY_SIX,
   TOP_SCORE,
+  EMAIL_CAPS,
+  SCORE_CAPS,
+  CLOSE,
+  TOP_SCORE_CAPS
 } from "../../constants/string";
 import {
   GENERIC_FAILIURE,
   GENERIC_SUCCESS,
-  SUCCESS,
 } from "../../constants/codes.jsx";
 import "./MemoryGame.css";
 import Overlay from "../../components/overlay/Overlay";
@@ -200,7 +203,7 @@ export default function MemoryGame() {
           }}
         >
           {items.map((ele, index) => (
-            <div key={`${index}${ele.id}`} onClick={() => cirleClicked(ele)}>
+            <div key={`${index}${JSON.stringify(ele)}`} onClick={() => cirleClicked(ele)}>
               <div
                 className={`mGameCircle ${
                   selectedItems.some((item) => item.id === ele.id)
@@ -257,19 +260,21 @@ export default function MemoryGame() {
         <>
           <SpaceFiller margin="20px" />
           <div className="overlay-content-table">
-            <div className="overlay-table-header1">EMAIL</div>
-            <div className="overlay-table-header2">SCORE</div>
+            <div className="overlay-table-header1">{EMAIL_CAPS}</div>
+            <div className="overlay-table-header2">{SCORE_CAPS}</div>
           </div>
           <SpaceFiller margin="20px" />
           {highScoreList.map((ele, i) => (
-            <div key={`${i}_${ele.score}`}>
+            <div key={`${i}_${JSON.stringify(ele)}`}>
               <div
                 className={`overlay-content-table ${
                   i % 2 === 0 ? "grey-backgroud" : ""
                 }`}
               >
                 <div className="overlay-table-column1">{ele.email}</div>
-                <div className="overlay-table-column2">{scoreFormatter(ele.score)}</div>
+                <div className="overlay-table-column2">
+                  {scoreFormatter(ele.score)}
+                </div>
               </div>
               <SpaceFiller margin="5px" />
             </div>
@@ -302,7 +307,10 @@ export default function MemoryGame() {
               onChange={(e) => onDropdownSelect(e)}
             >
               {options.map((ele, index) => (
-                <option key={`${index}${ele.value}`} value={ele.value}>
+                <option
+                  key={`${index}${JSON.stringify(ele)}`}
+                  value={ele.value}
+                >
                   {ele.label}
                 </option>
               ))}
@@ -344,8 +352,8 @@ export default function MemoryGame() {
       </div>
       {isOverlayOpen && (
         <Overlay
-          headerTitle="TOP SCORE"
-          buttonTitle="Close"
+          headerTitle={TOP_SCORE_CAPS}
+          buttonTitle={CLOSE}
           content={overlayContent()}
           onClose={toggleOverlay}
         />
