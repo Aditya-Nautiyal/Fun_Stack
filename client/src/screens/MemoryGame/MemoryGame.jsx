@@ -15,13 +15,10 @@ import {
   TOP_SCORE,
   EMAIL_CAPS,
   SCORE_CAPS,
-  CLOSE,
-  TOP_SCORE_CAPS
+  TOP_SCORE_CAPS,
+  CLOSE_CAPS,
 } from "../../constants/string";
-import {
-  GENERIC_FAILIURE,
-  GENERIC_SUCCESS,
-} from "../../constants/codes.jsx";
+import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
 import "./MemoryGame.css";
 import Overlay from "../../components/overlay/Overlay";
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
@@ -53,18 +50,17 @@ export default function MemoryGame() {
   const [stoppageTime, setStoppageTime] = useState("");
   const [isOverlayOpen, setOverlayOpen] = useState(false);
   const [highScoreList, setHighScoreList] = useState([]);
-
+  const [dropdownValue, setDropdownValue] = useState("4"); // State to store the height
   const [options] = useState([
     {
       label: FOUR_BY_FOUR,
-      value: 4,
+      value: "4",
     },
     {
       label: SIX_BY_SIX,
-      value: 6,
+      value: "6",
     },
   ]);
-  const [dropdownValue, setDropdownValue] = useState(4); // State to store the height
 
   useEffect(() => {
     if (divRef.current) {
@@ -203,7 +199,10 @@ export default function MemoryGame() {
           }}
         >
           {items.map((ele, index) => (
-            <div key={`${index}${JSON.stringify(ele)}`} onClick={() => cirleClicked(ele)}>
+            <div
+              key={`${index}${JSON.stringify(ele)}`}
+              onClick={() => cirleClicked(ele)}
+            >
               <div
                 className={`mGameCircle ${
                   selectedItems.some((item) => item.id === ele.id)
@@ -261,7 +260,7 @@ export default function MemoryGame() {
           <SpaceFiller margin="20px" />
           <div className="overlay-content-table">
             <div className="overlay-table-header1">{EMAIL_CAPS}</div>
-            <div className="overlay-table-header2">{SCORE_CAPS}</div>
+            <div className="overlay-table-header2">{`${SCORE_CAPS} (${dropdownValue} * ${dropdownValue})`}</div>
           </div>
           <SpaceFiller margin="20px" />
           {highScoreList.map((ele, i) => (
@@ -289,7 +288,9 @@ export default function MemoryGame() {
   const scoreFormatter = (seconds) => {
     const minutes = Math.floor(seconds / 60); // Get the minutes
     const remainingSeconds = seconds % 60; // Get the remaining seconds
-    return  `${minutes} min ${remainingSeconds < 10 ? '0' : ''}${remainingSeconds} sec`;
+    return `${minutes} min ${
+      remainingSeconds < 10 ? "0" : ""
+    }${remainingSeconds} sec`;
   };
 
   return (
@@ -353,7 +354,7 @@ export default function MemoryGame() {
       {isOverlayOpen && (
         <Overlay
           headerTitle={TOP_SCORE_CAPS}
-          buttonTitle={CLOSE}
+          buttonTitle={CLOSE_CAPS}
           content={overlayContent()}
           onClose={toggleOverlay}
         />

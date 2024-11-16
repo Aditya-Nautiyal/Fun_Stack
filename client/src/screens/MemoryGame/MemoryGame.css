@@ -59,7 +59,7 @@
   font-family: cursive;
   font-size: 20px;
   font-weight: bold;
-  color: #333; /* Dark color for text */
+  color: black; /* Dark color for text */
   padding-left: 20px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
 }
@@ -121,12 +121,13 @@
   transition: transform 0.6s;
   transform-style: preserve-3d;
   position: relative;
+  border: 1px solid black;
 }
 
 /* Hover effect */
 .mGameCircle:hover {
   background-color: #274b7a; /* Change color on hover */
-  border-color: rgb(200, 200, 200); /* Add border color on hover */
+  border-color:black; /* Add border color on hover */
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
   cursor: pointer;
 }
