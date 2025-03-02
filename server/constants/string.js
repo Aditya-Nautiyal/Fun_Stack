@@ -9,6 +9,7 @@ const EMAIL_CRITERIA_NOT_MEET = "Email does not meet the criteria";
 const CONGRATULATIONS_HIGH_SCORE = "Congratulation, you made it to top 10";
 const CONGRATULATIONS = "Congratulation";
 const INTERNAL_SERVER_ERROR = "Internal server error";
+const TOKEN_CREATION_FALIED = "Token creation failed";
 
 
 
@@ -24,5 +25,6 @@ module.exports = {
   CONGRATULATIONS_HIGH_SCORE,
   CONGRATULATIONS,
   INTERNAL_SERVER_ERROR,
+  TOKEN_CREATION_FALIED
 };
 

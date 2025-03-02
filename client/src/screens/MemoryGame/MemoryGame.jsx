@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useJwt } from "react-jwt";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
@@ -29,9 +29,8 @@ const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
 
 export default function MemoryGame() {
-  const location = useLocation();
-  const { emailFromProps } = location.state || {};
-
+  const token = localStorage.getItem("token");
+  const tokenDetails = useJwt(token);
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
 
@@ -50,6 +49,7 @@ export default function MemoryGame() {
   const [stoppageTime, setStoppageTime] = useState("");
   const [isOverlayOpen, setOverlayOpen] = useState(false);
   const [highScoreList, setHighScoreList] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
   const [dropdownValue, setDropdownValue] = useState("4"); // State to store the height
   const [options] = useState([
     {
@@ -61,6 +61,12 @@ export default function MemoryGame() {
       value: "6",
     },
   ]);
+
+  useEffect(() => {
+    if (tokenDetails) {
+      setUserEmail(tokenDetails?.decodedToken?.username)
+  }
+  }, []);
 
   useEffect(() => {
     if (divRef.current) {
@@ -132,7 +138,7 @@ export default function MemoryGame() {
 
   const cirleClicked = (ele) => {
     if (
-      selectedItems.some((item) => item.id === ele.id) &&
+      selectedItems.some((item) => item.id === ele.id) && 
       ele.finalCheck === false
     ) {
       setSelectedItems(selectedItems.filter((item) => item.id !== ele.id));
@@ -225,7 +231,7 @@ export default function MemoryGame() {
   const submitScoreApi = async () => {
     const score = String(stoppageTime?.minutes * 60 + stoppageTime?.seconds);
     const result = await submitScore(urlGenerator("submitScore"), {
-      email: emailFromProps,
+      email: userEmail,
       score,
       matrixSize: String(dropdownValue),
     });

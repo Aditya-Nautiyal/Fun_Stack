@@ -19,11 +19,13 @@ const {
   CONGRATULATIONS_HIGH_SCORE,
   CONGRATULATIONS,
   INTERNAL_SERVER_ERROR,
+  TOKEN_CREATION_FALIED
 } = require("./constants/string.js");
 const { DEFAULT_SUCCESS, DEFAULT_ERROR } = require("./constants/codes.js");
 const {
   validateEmail,
   validatePassword,
+  generateToken
 } = require("./utility/commonFunction.js");
 const path = require("path");
 
@@ -52,9 +54,19 @@ app.post("/login", (req, res) => {
   EmployeeModel.findOne({ email: email }).then((user) => {
     if (user) {
       if (user.password === password) {
+        let token;
+        try{
+          token = generateToken(user);
+        } catch(e){
+          return res.json({
+            statusCode: DEFAULT_ERROR,
+            desc: TOKEN_CREATION_FALIED
+          });
+        }
         res.json({
           statusCode: DEFAULT_SUCCESS,
           desc: LOGIN_SUCCESS,
+          token: token
         });
       } else {
         res.json({
