@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import {
   validateEmail,
@@ -84,8 +85,11 @@ function LoginAndSignUp() {
     });
     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
       toast.success(result?.data?.desc, ToastMsgStructure);
-      localStorage.setItem("token", result?.data?.token)
-      navigate(MemoryGame, { state: { emailFromProps: email } });
+      const tokenFromBE = result?.data?.token;
+      const decodedToken = jwtDecode(tokenFromBE);
+      const { username } = decodedToken || "";
+      localStorage.setItem("token", tokenFromBE)
+      navigate(MemoryGame, { state: { emailFromProps: username } }); 
     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
       toast.error(result?.data?.desc, ToastMsgStructure);
     } else {
