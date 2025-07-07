@@ -56,7 +56,7 @@
 }
 
 .mGameTitle {
-  font-family: cursive;
+  font-family: sans-serif;
   font-size: 20px;
   font-weight: bold;
   color: black; /* Dark color for text */
@@ -66,7 +66,7 @@
 
 .newButtonMGame,
 .styled-select {
-  font-family: cursive;
+  font-family: sans-serif;
   background-color: #ffa500; /* Orange-yellow color */
   color: white; /* Text color */
   font-size: 14px; /* Font size */
@@ -149,7 +149,7 @@
 }
 
 .mGameCircle .back {
-  font-family: cursive;
+  font-family: sans-serif;
   transform: rotateY(180deg);
   background-color: #b0c4d9; /* Style for the flipped side */
   width: 50px; /* Adjust size as needed */
@@ -171,7 +171,7 @@
 }
 
 .topScore-container {
-  font-family: cursive;
+  font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
   color: white; /* Dark text color */
@@ -202,7 +202,7 @@
 
 .overlay-table-header1, .overlay-table-header2, .overlay-table-column1, .overlay-table-column2{
   flex: 0.5;
-  font-family: cursive;
+  font-family: sans-serif;
   font-size: 16px;
   font-weight: bold;
   color: #333; /* Dark color for text */
@@ -210,7 +210,7 @@
 }
 
 .overlay-table-column1, .overlay-table-column2{
-  font-family: cursive;
+  font-family: sans-serif;
   font-size: 14px;
   font-weight: 400;
   
