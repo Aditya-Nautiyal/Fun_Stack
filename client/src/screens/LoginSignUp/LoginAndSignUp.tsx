@@ -35,6 +35,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { MemoryGame } from "../../constants/navigation.jsx";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
+import LanguageSelector from "../../components/languageSelector/LanguageSelector.js";
 
 function LoginAndSignUp() {
   const [email, setEmail] = useState("");
@@ -88,8 +89,8 @@ function LoginAndSignUp() {
       const tokenFromBE = result?.data?.token;
       const decodedToken = jwtDecode(tokenFromBE);
       const { username } = decodedToken || "";
-      localStorage.setItem("token", tokenFromBE)
-      navigate(MemoryGame, { state: { emailFromProps: username } }); 
+      localStorage.setItem("token", tokenFromBE);
+      navigate(MemoryGame, { state: { emailFromProps: username } });
     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
       toast.error(result?.data?.desc, ToastMsgStructure);
     } else {
@@ -184,6 +185,10 @@ function LoginAndSignUp() {
             <u>{REGISTER}</u>
           </div>
         </div>
+        <SpaceFiller margin="20px" />
+        <div className="common-flex-box">
+          <LanguageSelector defaultLanguage="en" />
+          </div>
       </div>
     );
   };

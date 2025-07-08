@@ -1,0 +1,57 @@
+.language-selector {
+  position: relative;
+  width: 100px;
+  font-family: system-ui;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.language-selector-header {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arrow {
+  margin-left: 10px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.language-selector-list {
+  position: absolute;
+  bottom: 110%; /* ⬅ instead of top: 110% */
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 4px; /* spacing from the trigger */
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.language-selector-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.language-selector-item:hover {
+  background-color: #f0f0f0;
+}
+
+.language-selector-item.selected {
+  background-color: #e6f0ff;
+  font-weight: 500;
+}
