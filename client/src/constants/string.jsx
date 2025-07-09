@@ -24,6 +24,7 @@ export const SCORE_CAPS = "SCORE";
 export const CLOSE = "CLose";
 export const CLOSE_CAPS = "CLOSE";
 export const TOP_SCORE_CAPS = "TOP SCORE";
+export const LOGOUT = "Logout";
 
 
 

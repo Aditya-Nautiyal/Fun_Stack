@@ -17,10 +17,14 @@ import {
   SCORE_CAPS,
   TOP_SCORE_CAPS,
   CLOSE_CAPS,
+  LOGOUT,
 } from "../../constants/string";
+import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
 import "./MemoryGame.css";
 import Overlay from "../../components/overlay/Overlay";
+import { useNavigate } from "react-router-dom";
+
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import { toast } from "react-toastify";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
@@ -33,7 +37,7 @@ export default function MemoryGame() {
   const tokenDetails = useJwt(token);
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
-
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [checkPairArray, setCheckPairArray] = useState([]);
@@ -64,8 +68,8 @@ export default function MemoryGame() {
 
   useEffect(() => {
     if (tokenDetails) {
-      setUserEmail(tokenDetails?.decodedToken?.username)
-  }
+      setUserEmail(tokenDetails?.decodedToken?.username);
+    }
   }, []);
 
   useEffect(() => {
@@ -138,7 +142,7 @@ export default function MemoryGame() {
 
   const cirleClicked = (ele) => {
     if (
-      selectedItems.some((item) => item.id === ele.id) && 
+      selectedItems?.some((item) => item.id === ele.id) &&
       ele.finalCheck === false
     ) {
       setSelectedItems(selectedItems.filter((item) => item.id !== ele.id));
@@ -299,15 +303,21 @@ export default function MemoryGame() {
     }${remainingSeconds} sec`;
   };
 
+  const onLogOutClick = () => {
+    try {
+      localStorage.removeItem("token");
+      navigate(LoginAndSignUp); // Make sure LoginAndSignUp is a route or path string
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>
         <div className="headerContent">
           <div className="mGameTitle">{FUN_STACK}</div>
           <div className="mGameHeaderButtonWrapper">
-            <button className="newButtonMGame" onClick={newGameButtonClicked}>
-              {NEW_GAME}
-            </button>
             <select
               id="options"
               className="styled-select"
@@ -322,6 +332,9 @@ export default function MemoryGame() {
                 </option>
               ))}
             </select>
+            <button className="logout-button" onClick={onLogOutClick}>
+              {LOGOUT}
+            </button>
           </div>
         </div>
       </div>
@@ -344,6 +357,9 @@ export default function MemoryGame() {
         style={{ gap: "30px" }}
         ref={footerRef}
       >
+        <button className="newButtonMGame" onClick={newGameButtonClicked}>
+          {NEW_GAME}
+        </button>
         <Timer
           key={timerKey}
           initialMinutes={initialMinute}

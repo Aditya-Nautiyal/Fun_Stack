@@ -11,7 +11,7 @@
   background-position: center;
   display: flex;
   flex: 1;
-  background-image: url('/wolf.jpg');
+  background-image: url("/wolf.jpg");
 }
 
 .mGameContainer {
@@ -64,10 +64,9 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
 }
 
-.newButtonMGame,
 .styled-select {
   font-family: sans-serif;
-  background-color: #ffa500; /* Orange-yellow color */
+  background-color: #e69500;
   color: white; /* Text color */
   font-size: 14px; /* Font size */
   font-weight: bold;
@@ -77,10 +76,6 @@
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s ease; /* Smooth transition */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-}
-
-.newButtonMGame:hover {
-  background-color: #e69500; /* Slightly darker shade on hover */
 }
 
 .mGameHeaderButtonWrapper {
@@ -127,7 +122,7 @@
 /* Hover effect */
 .mGameCircle:hover {
   background-color: #274b7a; /* Change color on hover */
-  border-color:black; /* Add border color on hover */
+  border-color: black; /* Add border color on hover */
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
   cursor: pointer;
 }
@@ -170,7 +165,9 @@
   left: 50%;
 }
 
-.topScore-container {
+.topScore-container,
+.newButtonMGame,
+.logout-button {
   font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
@@ -185,22 +182,27 @@
   caret-color: transparent;
 }
 
-.topScore-container:hover {
+.topScore-container:hover,
+.newButtonMGame:hover,
+.logout-button:hover {
   background-color: #e69500; /* Slightly darker shade on hover */
 }
 
-.overlay-content-table{
+.overlay-content-table {
   display: flex;
   flex: 1;
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-.grey-backgroud{
-  background-color: #E0E0E0;
+.grey-backgroud {
+  background-color: #e0e0e0;
 }
 
-.overlay-table-header1, .overlay-table-header2, .overlay-table-column1, .overlay-table-column2{
+.overlay-table-header1,
+.overlay-table-header2,
+.overlay-table-column1,
+.overlay-table-column2 {
   flex: 0.5;
   font-family: sans-serif;
   font-size: 16px;
@@ -209,12 +211,13 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
 }
 
-.overlay-table-column1, .overlay-table-column2{
+.overlay-table-column1,
+.overlay-table-column2 {
   font-family: sans-serif;
   font-size: 14px;
   font-weight: 400;
-  
 }
+
 /* Media query for small screens */
 @media (max-width: 768px) {
   .headerContent,

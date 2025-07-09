@@ -23,7 +23,7 @@
 }
 
 .overlay-title{
-  font-family: cursive;
+  font-family: sans-serif;
   font-size: 18px;
   font-weight: bold;
   color: #333; /* Dark color for text */
@@ -34,7 +34,7 @@
 }
 
 .overlay-button{
-  font-family: cursive;
+  font-family: sans-serif;
   background-color: #ffa500; /* Orange-yellow color */
   color: white; /* Text color */
   font-size: 14px; /* Font size */
