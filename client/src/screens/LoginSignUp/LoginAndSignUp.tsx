@@ -59,6 +59,13 @@ function LoginAndSignUp() {
   ];
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate(MemoryGame, { replace: true });
+    }
+  }, []);
+
+  useEffect(() => {
     setPasswordValidation(validatePassword(password));
   }, [password]);
 
