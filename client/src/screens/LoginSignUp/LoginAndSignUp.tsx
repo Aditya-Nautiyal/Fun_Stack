@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { jwtDecode } from "jwt-decode";
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import {
@@ -36,6 +36,7 @@ import { useNavigate } from "react-router-dom";
 import { MemoryGame } from "../../constants/navigation.jsx";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 import LanguageSelector from "../../components/languageSelector/LanguageSelector.js";
+import { useTranslation } from "react-i18next";
 
 function LoginAndSignUp() {
   const [email, setEmail] = useState("");
@@ -47,6 +48,7 @@ function LoginAndSignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const validationStringArray = [
@@ -115,6 +117,10 @@ function LoginAndSignUp() {
     setIsLoading(false);
   };
 
+  const changeLanguage = (lang: string | undefined) => {
+    i18n.changeLanguage(lang);
+  };
+
   const isLoginButtonEnabled = () => {
     if (
       !emailError &&
@@ -164,7 +170,7 @@ function LoginAndSignUp() {
   const loginStructure = () => {
     return (
       <div className="loginWrapper">
-        <div className="loginHeader common-flex-box">{LOGIN}</div>
+        <div className="loginHeader common-flex-box">{t("login")}</div>
         <SpaceFiller margin="15px" />
         <div className="emailHeader">{EMAIL_ADDRESS}</div>
         <SpaceFiller />
@@ -187,8 +193,8 @@ function LoginAndSignUp() {
         </div>
         <SpaceFiller margin="20px" />
         <div className="common-flex-box">
-          <LanguageSelector defaultLanguage="en" />
-          </div>
+          <LanguageSelector defaultLanguage="en" onChange={(lan) => changeLanguage(lan)}/>
+        </div>
       </div>
     );
   };

@@ -4,12 +4,11 @@ import './LanguageSelector.css';
 const languages = [
   { code: 'en', label: 'English' },
   { code: 'hi', label: 'Hindi' },
-  { code: 'es', label: 'Spanish' },
-  { code: 'fr', label: 'French' },
-  { code: 'de', label: 'German' },
+  { code: 'fr', label: 'Spanish' },
+  { code: 'es', label: 'French' },
 ];
 
-const LanguageSelector = ({ defaultLanguage = 'en', onChange = () => {} }) => {
+const LanguageSelector = ({ defaultLanguage = 'en', onChange }) => {
   const [selected, setSelected] = useState(defaultLanguage);
   const [isOpen, setIsOpen] = useState(false);
 
