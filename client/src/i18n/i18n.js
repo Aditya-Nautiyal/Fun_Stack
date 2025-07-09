@@ -5,6 +5,7 @@ import { enTranslationConstants } from "./en";
 import { frTranslationConstants } from "./fr";
 import { esTranslationConstants } from "./es";
 import { hiTranslationConstants } from "./hi";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)

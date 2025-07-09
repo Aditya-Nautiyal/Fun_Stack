@@ -19,13 +19,13 @@ const {
   CONGRATULATIONS_HIGH_SCORE,
   CONGRATULATIONS,
   INTERNAL_SERVER_ERROR,
-  TOKEN_CREATION_FALIED
+  TOKEN_CREATION_FALIED,
 } = require("./constants/string.js");
 const { DEFAULT_SUCCESS, DEFAULT_ERROR } = require("./constants/codes.js");
 const {
   validateEmail,
   validatePassword,
-  generateToken
+  generateToken,
 } = require("./utility/commonFunction.js");
 const path = require("path");
 
@@ -55,18 +55,18 @@ app.post("/login", (req, res) => {
     if (user) {
       if (user.password === password) {
         let token;
-        try{
+        try {
           token = generateToken(user);
-        } catch(e){
+        } catch (e) {
           return res.json({
             statusCode: DEFAULT_ERROR,
-            desc: TOKEN_CREATION_FALIED
+            desc: TOKEN_CREATION_FALIED,
           });
         }
         res.json({
           statusCode: DEFAULT_SUCCESS,
           desc: LOGIN_SUCCESS,
-          token: token
+          token: token,
         });
       } else {
         res.json({
