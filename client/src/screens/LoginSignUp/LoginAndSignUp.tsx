@@ -172,7 +172,7 @@ function LoginAndSignUp() {
       <div className="loginWrapper">
         <div className="loginHeader common-flex-box">{t("login")}</div>
         <SpaceFiller margin="15px" />
-        <div className="emailHeader">{EMAIL_ADDRESS}</div>
+        <div className="emailHeader">{t("emailAddress")}</div>
         <SpaceFiller />
         {emailAndPasswordStructure()}
         <SpaceFiller margin="30px" />
@@ -182,18 +182,21 @@ function LoginAndSignUp() {
           }
           onClick={onLogin}
         >
-          {LOGIN}
+          {t("login")}
         </button>
         <SpaceFiller margin="20px" />
         <div className="registerUserWrapper common-flex-box">
-          <div className="donotHaveAccountText">{DONOT_HAVE_ACCESS}</div>
+          <div className="donotHaveAccountText">{t("doNotHaveAccess")}</div>
           <div className="registerText" onClick={onFlip}>
-            <u>{REGISTER}</u>
+            <u>{t("register")}</u>
           </div>
         </div>
         <SpaceFiller margin="20px" />
         <div className="common-flex-box">
-          <LanguageSelector defaultLanguage="en" onChange={(lan) => changeLanguage(lan)}/>
+          <LanguageSelector
+            defaultLanguage="en"
+            onChange={(lan) => changeLanguage(lan)}
+          />
         </div>
       </div>
     );
@@ -249,24 +252,24 @@ function LoginAndSignUp() {
           type="email"
           value={email} // Bind the input value to the state
           onChange={onEmailChange} // Call handleInputChange on every keystroke
-          placeholder={EMAIL_ADDRESS}
+          placeholder={t("emailAddress")}
           className="inputEmail"
           required
         />
         {emailError && (
           <>
             <SpaceFiller margin="5px" />
-            <div className="errorMessage">{`**${INVALID_MAIL}`}</div>
+            <div className="errorMessage">{`**${t("invalidEmail")}`}</div>
           </>
         )}
         <SpaceFiller margin="15px" />
-        <div className="passwordHeader">{PASSWORD}</div>
+        <div className="passwordHeader">{t("password")}</div>
         <SpaceFiller />
         <input
           type={showPassword ? "text" : "password"}
           value={password} // Bind the input value to the state
           onChange={onPasswordChange} // Call handleInputChange on every keystroke
-          placeholder={PASSWORD}
+          placeholder={t("password")}
           className="inputPassword"
           required
           onCopy={preventCopyPasteCut} // Disable copy
@@ -281,7 +284,7 @@ function LoginAndSignUp() {
             onChange={handleCheckboxChange} // Handle change event
             className="passwordCheckbox"
           />
-          <div>{SHOW_PASSWORD}</div>
+          <div>{t("showPassword")}</div>
         </div>
       </>
     );

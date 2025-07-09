@@ -6,5 +6,5 @@ export const ToastMsgStructure = {
   draggable: true, // Enable drag to dismiss
   theme: "light", // Toast theme
   closeButton: false, // Remove the close button
-  position:"top-center",
+  position: "top-center",
 };
