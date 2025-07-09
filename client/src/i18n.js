@@ -22,6 +22,8 @@ i18n
           languageSelector: "Select Language",
           doNotHaveAccess: "Don't have an account?",
           invalidEmail: "Invalid email",
+          signUp: "Sign Up",
+          alreadyAccount : "Already have an account?",
         },
       },
       hi: {
@@ -36,6 +38,8 @@ i18n
           languageSelector: "भाषा चुनें",
           doNotHaveAccess: "क्या आपके पास खाता नहीं है?",
           invalidEmail: "अमान्य ईमेल",
+          signUp: "साइन अप",
+          alreadyAccount: "क्या आपके पास पहले से खाता है?",
         },
       },
       fr: {
@@ -50,6 +54,8 @@ i18n
           languageSelector: "Sélectionner la langue",
           doNotHaveAccess: "Vous n'avez pas de compte ?", 
           invalidEmail: "E-mail invalide",
+          signUp: "S'inscrire",
+          alreadyAccount: "Vous avez déjà un compte ?",
         },
       },
       es: {
@@ -65,6 +71,8 @@ i18n
           languageSelector: "Seleccionar idioma",
           doNotHaveAccess: "¿No tienes una cuenta?",
           invalidEmail: "Correo electrónico inválido",
+          signUp: "Registrarse",
+          alreadyAccount: "¿Ya tienes una cuenta?",
         },
       },
     },

@@ -194,7 +194,7 @@ function LoginAndSignUp() {
         <SpaceFiller margin="20px" />
         <div className="common-flex-box">
           <LanguageSelector
-            defaultLanguage="en"
+            defaultLanguage={i18n.language || "en"}
             onChange={(lan) => changeLanguage(lan)}
           />
         </div>
@@ -207,12 +207,12 @@ function LoginAndSignUp() {
       <div className="signUpWrapper">
         <div className="loginHeader common-flex-box">{SIGN_UP}</div>
         <SpaceFiller margin="15px" />
-        <div className="emailHeader">{EMAIL_ADDRESS}</div>
+        <div className="emailHeader">{t("emailAddress")}</div>
         <SpaceFiller />
         {emailAndPasswordStructure()}
         <SpaceFiller margin="10px" />
         <div className={password?.length > 0 ? "visible" : "hidden"}>
-          {Object.keys(passwordValidation).map((key, index) => (
+          {Object.keys(passwordValidation)?.map((key, index) => (
             <div className={"validationRow"} key={`${key}${index}`}>
               <div
                 className={
@@ -232,14 +232,21 @@ function LoginAndSignUp() {
           }
           onClick={onSignUp}
         >
-          {SIGN_UP}
+          {t("signUp")}
         </button>
         <SpaceFiller margin="20px" />
         <div className="registerUserWrapper common-flex-box">
-          <div className="donotHaveAccountText">{ALREADY_ACCOUNT}</div>
+          <div className="donotHaveAccountText">{t("alreadyAccount")}</div>
           <div className="registerText" onClick={onFlip}>
-            <u>{LOGIN}</u>
+            <u>{t("login")}</u>
           </div>
+        </div>
+        <SpaceFiller margin="20px" />
+        <div className="common-flex-box">
+          <LanguageSelector
+            defaultLanguage={i18n.language || "en"}
+            onChange={(lan) => changeLanguage(lan)}
+          />
         </div>
       </div>
     );
