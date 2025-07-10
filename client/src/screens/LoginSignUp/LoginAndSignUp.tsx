@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useTransition } from "react";
+import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import {
@@ -12,25 +12,16 @@ import {
 } from "../../services/apiCall.js";
 import { toast } from "react-toastify";
 import {
-  LOGIN,
-  EMAIL_ADDRESS,
-  INVALID_MAIL,
-  PASSWORD,
-  DONOT_HAVE_ACCESS,
-  REGISTER,
   SIGN_UP,
-  ALREADY_ACCOUNT,
   AT_LEAST_UPPER_CASE,
   AT_LEAST_DIGITS,
   AT_LEAST_SPECIAL_CHARACTERS,
   AT_LEAST_LETTERS,
-  SHOW_PASSWORD,
 } from "../../constants/string.jsx";
 import "./LoginAndSignUp.css";
 import {
   GENERIC_FAILIURE,
   GENERIC_SUCCESS,
-  SUCCESS,
 } from "../../constants/codes.jsx";
 import { useNavigate } from "react-router-dom";
 import { MemoryGame } from "../../constants/navigation.jsx";
@@ -59,7 +50,7 @@ function LoginAndSignUp() {
   ];
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       navigate(MemoryGame, { replace: true });
     }
@@ -96,9 +87,11 @@ function LoginAndSignUp() {
     if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
       toast.success(result?.data?.desc, ToastMsgStructure);
       const tokenFromBE = result?.data?.token;
-      const decodedToken = jwtDecode(tokenFromBE);
-      const { username } = decodedToken || "";
-      localStorage.setItem("token", tokenFromBE);
+      const { accessToken, refreshToken } = tokenFromBE || {};
+      const decodedAccessToken = jwtDecode(accessToken);
+      const { username } = decodedAccessToken || "";
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       navigate(MemoryGame, { state: { emailFromProps: username } });
     } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
       toast.error(result?.data?.desc, ToastMsgStructure);

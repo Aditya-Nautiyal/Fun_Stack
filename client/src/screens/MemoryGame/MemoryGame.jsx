@@ -33,7 +33,7 @@ const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
 
 export default function MemoryGame() {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   const tokenDetails = useJwt(token);
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
@@ -305,7 +305,8 @@ export default function MemoryGame() {
 
   const onLogOutClick = () => {
     try {
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       navigate(LoginAndSignUp); // Make sure LoginAndSignUp is a route or path string
     } catch (error) {
       console.error("Logout failed:", error);
