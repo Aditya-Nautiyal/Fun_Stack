@@ -1,9 +1,9 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { API_BASE_URL } from "../env"
 
 export const registerUser = async (url: string, body: any) => {
   try {
-    const result = await axios.post(url, { ...body });
+    const result = await axiosInstance.post(url, { ...body });
     return result;
   } catch (err) {
     return err;
@@ -12,7 +12,7 @@ export const registerUser = async (url: string, body: any) => {
 
 export const loginUser = async (url: string, body: any) => {
   try {
-    const result = await axios.post(url, { ...body });
+    const result = await axiosInstance.post(url, { ...body });
     return result;
   } catch (err) {
     return err;
@@ -21,7 +21,7 @@ export const loginUser = async (url: string, body: any) => {
 
 export const submitScore = async (url: string, body: any) => {
   try {
-    const result = await axios.post(url, { ...body });
+    const result = await axiosInstance.post(url, { ...body });
     return result;
   } catch (err) {
     return err;
@@ -30,7 +30,7 @@ export const submitScore = async (url: string, body: any) => {
 
 export const fetchHighScore = async (url: string, body: any) => {
   try {
-    const result = await axios.post(url, { ...body });
+    const result = await axiosInstance.post(url, { ...body });
     return result;
   } catch (err) {
     return err;
