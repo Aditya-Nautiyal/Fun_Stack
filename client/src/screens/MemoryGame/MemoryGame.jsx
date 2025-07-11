@@ -18,6 +18,7 @@ import {
   TOP_SCORE_CAPS,
   CLOSE_CAPS,
   LOGOUT,
+  LOGOUT_SUCCESS
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -308,6 +309,7 @@ export default function MemoryGame() {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       navigate(LoginAndSignUp); // Make sure LoginAndSignUp is a route or path string
+      toast.success(LOGOUT_SUCCESS, ToastMsgStructure);
     } catch (error) {
       console.error("Logout failed:", error);
     }

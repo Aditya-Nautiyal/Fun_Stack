@@ -25,6 +25,7 @@ export const CLOSE = "CLose";
 export const CLOSE_CAPS = "CLOSE";
 export const TOP_SCORE_CAPS = "TOP SCORE";
 export const LOGOUT = "Logout";
+export const LOGOUT_SUCCESS = "Logout Successful";
 
 
 
