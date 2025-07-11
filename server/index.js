@@ -2,10 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 
 const EmployeeModel = require("./models/Employee.js");
 const ScoreModelForFour = require("./models/ScoreForFour.js");
 const ScoreModelForSix = require("./models/ScoreForSix.js");
+const authenticate = require("./middlewares/authenticate.js");
 
 const {
   REGISTRATION_SUCCESS,
@@ -128,7 +130,7 @@ app.post("/register", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-app.post("/submitScore", async (req, res) => {
+app.post("/submitScore", authenticate, async (req, res) => {
   const { email, score, matrixSize } = req.body;
   try {
     const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
@@ -172,7 +174,7 @@ app.post("/submitScore", async (req, res) => {
   }
 });
 
-app.post("/getHighScore", async (req, res) => {
+app.post("/getHighScore", authenticate, async (req, res) => {
   const { matrixSize } = req.body;
   try {
     const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
@@ -186,6 +188,24 @@ app.post("/getHighScore", async (req, res) => {
       statusCode: DEFAULT_ERROR,
       desc: INTERNAL_SERVER_ERROR,
     });
+  }
+});
+
+app.post("/refresh-token", (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token required" });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET);
+    const newAccessToken = generateToken(decoded)?.accessToken;
+
+    return res.status(200).json({ accessToken: newAccessToken });
+  } catch (err) {
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
   }
 });
 
