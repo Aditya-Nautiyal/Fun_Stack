@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useJwt } from "react-jwt";
+import { db } from "../../firebase.js"
+import { collection, onSnapshot } from "firebase/firestore";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
@@ -18,7 +20,7 @@ import {
   TOP_SCORE_CAPS,
   CLOSE_CAPS,
   LOGOUT,
-  LOGOUT_SUCCESS
+  LOGOUT_SUCCESS,
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -71,7 +73,22 @@ export default function MemoryGame() {
     if (tokenDetails) {
       setUserEmail(tokenDetails?.decodedToken?.username);
     }
-  }, []);
+  }, [tokenDetails]);
+
+  useEffect(() => {
+    if (!dropdownValue) return;
+
+    const collectionName = dropdownValue === 4 ? "scoreForFour" : "scoreForSix";
+    const scoresRef = collection(db, collectionName);
+
+    const unsubscribe = onSnapshot(scoresRef, (snapshot) => {
+      const scores = snapshot.docs.map((doc) => doc.data());
+      const sorted = scores.sort((a, b) => b.score - a.score);
+      setHighScoreList(sorted);
+    });
+
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, [dropdownValue]);
 
   useEffect(() => {
     if (divRef.current) {
