@@ -1,4 +1,7 @@
-require("dotenv").config();
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV || 'development'}`
+});
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -38,10 +41,7 @@ app.use(express.json());
 app.use(cors());
 
 // Determine the MongoDB URI based the on environments
-const mongoURI =
-  process.env.NODE_ENV === "production"
-    ? process.env.MONGODB_PROD_URI
-    : process.env.MONGODB_LOCAL_URI;
+const mongoURI = process.env.MONGODB_URI;
 
 mongoose
   .connect(mongoURI, {
