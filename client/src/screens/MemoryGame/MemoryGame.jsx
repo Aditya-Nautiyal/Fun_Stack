@@ -68,6 +68,7 @@ export default function MemoryGame() {
   ]);
 
   useEffect(() => {
+    // Check if token is valid and extract user email
     if (tokenDetails) {
       setUserEmail(tokenDetails?.decodedToken?.username);
     }
