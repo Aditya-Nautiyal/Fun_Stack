@@ -328,7 +328,7 @@ export default function MemoryGame() {
       navigate(LoginAndSignUp); // Make sure LoginAndSignUp is a route or path string
       toast.success(LOGOUT_SUCCESS, ToastMsgStructure);
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout failed:-", error);
     }
   };
 
