@@ -67,33 +67,30 @@
 .styled-select {
   font-family: sans-serif;
   background-color: #e69500;
-  color: white; /* Text color */
   font-size: 14px; /* Font size */
   font-weight: bold;
-  padding: 10px 20px; /* Spacing around the text */
   border: none; /* Remove default border */
-  border-radius: 20px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s ease; /* Smooth transition */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  background-color: white;
+  font-weight: bold;
+  color: #333;
+  border-radius: 5px;
+  padding: 5px;
+  border: 2px solid black;
 }
 
+.styled-select:focus {
+  border: 2px solid black;
+  outline: none;
+}
 .mGameHeaderButtonWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2vw;
   padding-right: 40px;
-}
-
-/* Hover effect */
-.styled-select {
-  background-color: white;
-  font-weight: bold;
-  color: #333;
-  border-radius: 5px;
-  padding: 5px;
-  border: 0.1px solid black;
 }
 
 .styled-select:hover {
@@ -116,7 +113,7 @@
   transition: transform 0.6s;
   transform-style: preserve-3d;
   position: relative;
-  border: 1px solid black;
+  border: 2px solid black;
 }
 
 /* Hover effect */
@@ -180,6 +177,7 @@
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
   caret-color: transparent;
+  border: 2px solid black; /* Border for better visibility */
 }
 
 .topScore-container:hover,
