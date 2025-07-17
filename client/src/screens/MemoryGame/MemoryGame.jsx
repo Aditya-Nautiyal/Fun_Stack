@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { useJwt } from "react-jwt";
-import { db } from "../../firebase.js"
+import { db } from "../../firebase/firebase.js";
 import { collection, onSnapshot } from "firebase/firestore";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
