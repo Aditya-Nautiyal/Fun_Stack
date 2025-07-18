@@ -1,5 +1,5 @@
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV || 'development'}`
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV || "development"}`,
 });
 
 const express = require("express");
@@ -227,6 +227,10 @@ app.post("/refresh-token", (req, res) => {
       .status(403)
       .json({ message: "Invalid or expired refresh token" });
   }
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 app.use(express.static("../client/dist"));
