@@ -8,7 +8,7 @@ import {
   MemoryGame as MGame,
 } from "./constants/navigation";
 import ProtectedRoute from "./screens/ProtectedRoute/ProtectedRoute";
-import Loader from "./components/Loader/Loader";
+import Loader from "./components/loader/Loader";
 import { useLoader } from "./context/LoaderContext";
 import "react-toastify/dist/ReactToastify.css";
 
