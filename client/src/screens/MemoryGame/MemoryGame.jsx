@@ -325,7 +325,7 @@ export default function MemoryGame() {
     try {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      navigate(LoginAndSignUp); // Make sure LoginAndSignUp is a route or path string
+      navigate("/");
       toast.success(LOGOUT_SUCCESS, ToastMsgStructure);
     } catch (error) {
       console.error("Logout failed:-", error);
