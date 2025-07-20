@@ -1,9 +1,12 @@
-require("dotenv").config();
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV || "development"}`,
+});
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-
+const { db } = require("./firebaseAdmin");
 const EmployeeModel = require("./models/Employee.js");
 const ScoreModelForFour = require("./models/ScoreForFour.js");
 const ScoreModelForSix = require("./models/ScoreForSix.js");
@@ -38,10 +41,7 @@ app.use(express.json());
 app.use(cors());
 
 // Determine the MongoDB URI based the on environments
-const mongoURI =
-  process.env.NODE_ENV === "production"
-    ? process.env.MONGODB_PROD_URI
-    : process.env.MONGODB_LOCAL_URI;
+const mongoURI = process.env.MONGODB_URI;
 
 mongoose
   .connect(mongoURI, {
@@ -133,28 +133,37 @@ app.post("/register", (req, res) => {
 app.post("/submitScore", authenticate, async (req, res) => {
   const { email, score, matrixSize } = req.body;
   try {
-    const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
-    // Fetch all scores for the provided email
-    const userScores = await Model.find({ email }).sort({ score: -1 }); // Sort descending by score
+    const collectionName = matrixSize === "4" ? "scoreForFour" : "scoreForSix";
+    const scoresRef = db.collection(collectionName);
+
+    // Get all scores for this user, sorted by score DESC
+    const snapshot = await scoresRef
+      .where("email", "==", email)
+      .orderBy("score", "desc")
+      .get();
+
+    const userScores = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const numericScore = Number(score);
 
     if (userScores.length < 10) {
-      // If less than 10 scores, add the new score
-      const newScore = new Model({ email, score });
-      await newScore.save();
+      // Less than 10 scores, add new one
+      await scoresRef.add({ email, score: numericScore });
       return res.json({
         statusCode: DEFAULT_SUCCESS,
         desc: CONGRATULATIONS_HIGH_SCORE,
       });
     }
 
-    // Check if the score is in the top 10
-    const lowestTopScore = Number(userScores[9].score); // Lowest score among the top 10
-    const numericScore = Number(score);
+    const lowestTopScore = userScores[9].score;
+
     if (numericScore > lowestTopScore) {
-      // If new score qualifies, remove the lowest score and add the new one
-      await Model.findOneAndDelete({ _id: userScores[9]._id });
-      const newScore = new Model({ email, score });
-      await newScore.save();
+      // Replace lowest score with new one
+      await scoresRef.doc(userScores[9].id).delete();
+      await scoresRef.add({ email, score: numericScore });
       return res.json({
         statusCode: DEFAULT_SUCCESS,
         desc: CONGRATULATIONS_HIGH_SCORE,
@@ -177,13 +186,24 @@ app.post("/submitScore", authenticate, async (req, res) => {
 app.post("/getHighScore", authenticate, async (req, res) => {
   const { matrixSize } = req.body;
   try {
-    const Model = matrixSize === "4" ? ScoreModelForFour : ScoreModelForSix;
-    const users = await Model.find({}).select("email score -_id");
+    const collectionName = matrixSize === "4" ? "scoreForFour" : "scoreForSix";
+    const scoresRef = db.collection(collectionName);
+
+    const snapshot = await scoresRef.get();
+    const users = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        email: data.email,
+        score: data.score,
+      };
+    });
+
     return res.json({
       statusCode: DEFAULT_SUCCESS,
       list: users,
     });
   } catch (error) {
+    console.error(error);
     return res.json({
       statusCode: DEFAULT_ERROR,
       desc: INTERNAL_SERVER_ERROR,
@@ -207,6 +227,10 @@ app.post("/refresh-token", (req, res) => {
       .status(403)
       .json({ message: "Invalid or expired refresh token" });
   }
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 app.use(express.static("../client/dist"));

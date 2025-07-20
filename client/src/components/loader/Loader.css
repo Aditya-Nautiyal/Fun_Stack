@@ -1,0 +1,45 @@
+/* Loader container that covers the full screen */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* Increased spacing between dots for better breathing room */
+    background-color: rgba(100, 100, 100, 0.85); /* Slightly brighter backdrop */
+    z-index: 9999;
+    backdrop-filter: blur(3px); /* Optional: adds blur effect behind loader */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Dot styling */
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: rgb(22, 11, 11); /* Richer indigo shade */
+    border-radius: 50%;
+    animation: bounce 1.2s infinite ease-in-out both;
+    box-shadow: 0 0 6px rgba(123, 110, 227, 0.6); /* Soft glow effect */
+}
+
+/* Bounce keyframes for pulsating animation */
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0.75);
+        opacity: 0.6;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Sequential delays for smooth wave effect */
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.24s; }
+.dot:nth-child(3) { animation-delay: -0.16s; }
+.dot:nth-child(4) { animation-delay: -0.08s; }
+.dot:nth-child(5) { animation-delay: 0s; }

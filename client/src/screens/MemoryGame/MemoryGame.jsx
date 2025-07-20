@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useJwt } from "react-jwt";
+import { db } from "../../firebase/firebase.js";
+import { collection, onSnapshot } from "firebase/firestore";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
@@ -18,7 +20,7 @@ import {
   TOP_SCORE_CAPS,
   CLOSE_CAPS,
   LOGOUT,
-  LOGOUT_SUCCESS
+  LOGOUT_SUCCESS,
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -71,7 +73,7 @@ export default function MemoryGame() {
     if (tokenDetails) {
       setUserEmail(tokenDetails?.decodedToken?.username);
     }
-  }, []);
+  }, [tokenDetails]);
 
   useEffect(() => {
     if (divRef.current) {
@@ -190,14 +192,6 @@ export default function MemoryGame() {
     setStoppageTime(time);
   };
 
-  const toggleOverlay = () => {
-    if (!isOverlayOpen) {
-      getHighScore();
-    } else {
-      setOverlayOpen(!isOverlayOpen);
-    }
-  };
-
   const bodyStruture = () => {
     return (
       <>
@@ -249,18 +243,26 @@ export default function MemoryGame() {
     }
   };
 
-  const getHighScore = async () => {
-    const result = await fetchHighScore(urlGenerator("getHighScore"), {
-      matrixSize: String(dropdownValue),
-    });
-    if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
-      //  toast.success(result?.data?.desc, ToastMsgStructure);/
-      setHighScoreList(result?.data?.list);
-      setOverlayOpen(!isOverlayOpen);
-    } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
-      toast.error(result?.data?.desc, ToastMsgStructure);
+  const toggleOverlay = () => {
+    if (!isOverlayOpen) {
+      const collectionName =
+        dropdownValue === "4" ? "scoreForFour" : "scoreForSix";
+      const scoresRef = collection(db, collectionName);
+
+      // Start listening when opening overlay
+      const unsubscribe = onSnapshot(scoresRef, (snapshot) => {
+        const scores = snapshot.docs.map((doc) => doc.data());
+        const sorted = scores.sort((a, b) => b.score - a.score);
+        setHighScoreList(sorted);
+      });
+
+      // Store unsubscribe if needed later
+      setOverlayOpen(true);
+
+      // Optional: Clean up listener when overlay is closed
+      return () => unsubscribe();
     } else {
-      toast.error("Error...", ToastMsgStructure);
+      setOverlayOpen(false);
     }
   };
 
@@ -308,10 +310,10 @@ export default function MemoryGame() {
     try {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      navigate(LoginAndSignUp); // Make sure LoginAndSignUp is a route or path string
+      navigate("/");
       toast.success(LOGOUT_SUCCESS, ToastMsgStructure);
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout failed:-", error);
     }
   };
 

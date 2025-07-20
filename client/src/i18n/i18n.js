@@ -6,13 +6,15 @@ import { frTranslationConstants } from "./fr";
 import { esTranslationConstants } from "./es";
 import { hiTranslationConstants } from "./hi";
 
+const isDev = import.meta.env.MODE === "development"; 
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     lng: "en", // Default language
     fallbackLng: "en",
-    debug: true, // Set to false in production
+    debug: isDev, // Set to false in production
     resources: {
       en: {
         translation: enTranslationConstants,

@@ -8,12 +8,16 @@ import {
   MemoryGame as MGame,
 } from "./constants/navigation";
 import ProtectedRoute from "./screens/ProtectedRoute/ProtectedRoute";
+import Loader from "./components/loader/Loader";
+import { useLoader } from "./context/LoaderContext";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
+  const { loading } = useLoader();
   return (
     <BrowserRouter>
       <ToastContainer />
+      {loading && <Loader />}
       <Routes>
         <Route path="/" element={<LoginAndSignUp />} />
         <Route path={Login} element={<LoginAndSignUp />} />
