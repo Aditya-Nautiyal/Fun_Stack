@@ -76,21 +76,6 @@ export default function MemoryGame() {
   }, [tokenDetails]);
 
   useEffect(() => {
-    if (!dropdownValue) return;
-
-    const collectionName = dropdownValue === 4 ? "scoreForFour" : "scoreForSix";
-    const scoresRef = collection(db, collectionName);
-
-    const unsubscribe = onSnapshot(scoresRef, (snapshot) => {
-      const scores = snapshot.docs.map((doc) => doc.data());
-      const sorted = scores.sort((a, b) => b.score - a.score);
-      setHighScoreList(sorted);
-    });
-
-    return () => unsubscribe(); // Cleanup listener on unmount
-  }, [dropdownValue]);
-
-  useEffect(() => {
     if (divRef.current) {
       setHeaderHeight(divRef.current.offsetHeight); // Set the height from the ref
     }
@@ -207,14 +192,6 @@ export default function MemoryGame() {
     setStoppageTime(time);
   };
 
-  const toggleOverlay = () => {
-    if (!isOverlayOpen) {
-      getHighScore();
-    } else {
-      setOverlayOpen(!isOverlayOpen);
-    }
-  };
-
   const bodyStruture = () => {
     return (
       <>
@@ -266,18 +243,26 @@ export default function MemoryGame() {
     }
   };
 
-  const getHighScore = async () => {
-    const result = await fetchHighScore(urlGenerator("getHighScore"), {
-      matrixSize: String(dropdownValue),
-    });
-    if (String(result?.data?.statusCode) === GENERIC_SUCCESS) {
-      //  toast.success(result?.data?.desc, ToastMsgStructure);/
-      setHighScoreList(result?.data?.list);
-      setOverlayOpen(!isOverlayOpen);
-    } else if (String(result?.data?.statusCode) === GENERIC_FAILIURE) {
-      toast.error(result?.data?.desc, ToastMsgStructure);
+  const toggleOverlay = () => {
+    if (!isOverlayOpen) {
+      const collectionName =
+        dropdownValue === "4" ? "scoreForFour" : "scoreForSix";
+      const scoresRef = collection(db, collectionName);
+
+      // Start listening when opening overlay
+      const unsubscribe = onSnapshot(scoresRef, (snapshot) => {
+        const scores = snapshot.docs.map((doc) => doc.data());
+        const sorted = scores.sort((a, b) => b.score - a.score);
+        setHighScoreList(sorted);
+      });
+
+      // Store unsubscribe if needed later
+      setOverlayOpen(true);
+
+      // Optional: Clean up listener when overlay is closed
+      return () => unsubscribe();
     } else {
-      toast.error("Error...", ToastMsgStructure);
+      setOverlayOpen(false);
     }
   };
 
