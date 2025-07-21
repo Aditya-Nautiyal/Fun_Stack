@@ -183,6 +183,7 @@ app.post("/submitScore", authenticate, async (req, res) => {
   }
 });
 
+//Not using this endpoint, but keeping it for future use
 app.post("/getHighScore", authenticate, async (req, res) => {
   const { matrixSize } = req.body;
   try {
