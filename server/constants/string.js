@@ -10,6 +10,8 @@ const CONGRATULATIONS_HIGH_SCORE = "Congratulation, you made it to top 10";
 const CONGRATULATIONS = "Congratulation";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 const TOKEN_CREATION_FALIED = "Token creation failed";
+const REFRESH_TOKEN_REQUIRED = "Refresh token required";
+const INVALID_EXPIRED_TOKEN = "Invalid or expired token";
 
 
 
@@ -25,6 +27,8 @@ module.exports = {
   CONGRATULATIONS_HIGH_SCORE,
   CONGRATULATIONS,
   INTERNAL_SERVER_ERROR,
-  TOKEN_CREATION_FALIED
+  TOKEN_CREATION_FALIED,
+  REFRESH_TOKEN_REQUIRED,
+  INVALID_EXPIRED_TOKEN
 };
 

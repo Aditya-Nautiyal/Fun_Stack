@@ -25,6 +25,8 @@ const {
   CONGRATULATIONS,
   INTERNAL_SERVER_ERROR,
   TOKEN_CREATION_FALIED,
+  REFRESH_TOKEN_REQUIRED,
+  INVALID_EXPIRED_TOKEN
 } = require("./constants/string.js");
 const { DEFAULT_SUCCESS, DEFAULT_ERROR } = require("./constants/codes.js");
 const {
@@ -215,7 +217,7 @@ app.post("/getHighScore", authenticate, async (req, res) => {
 app.post("/refresh-token", (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh token required" });
+    return res.status(401).json({ message: REFRESH_TOKEN_REQUIRED });
   }
 
   try {
@@ -226,7 +228,7 @@ app.post("/refresh-token", (req, res) => {
   } catch (err) {
     return res
       .status(403)
-      .json({ message: "Invalid or expired refresh token" });
+      .json({ message: INVALID_EXPIRED_TOKEN });
   }
 });
 
