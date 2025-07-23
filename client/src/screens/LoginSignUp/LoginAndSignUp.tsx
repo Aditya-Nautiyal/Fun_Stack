@@ -19,10 +19,7 @@ import {
   AT_LEAST_LETTERS,
 } from "../../constants/string.jsx";
 import "./LoginAndSignUp.css";
-import {
-  GENERIC_FAILIURE,
-  GENERIC_SUCCESS,
-} from "../../constants/codes.jsx";
+import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
 import { useNavigate } from "react-router-dom";
 import { MemoryGame } from "../../constants/navigation.jsx";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
@@ -205,7 +202,7 @@ function LoginAndSignUp() {
   const signUpStructure = () => {
     return (
       <div className="signUpWrapper">
-        <div className="loginHeader common-flex-box">{SIGN_UP}</div>
+        <div className="loginHeader common-flex-box">{t("signUp")}</div>
         <SpaceFiller margin="15px" />
         <div className="emailHeader">{t("emailAddress")}</div>
         <SpaceFiller />

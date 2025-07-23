@@ -5,8 +5,9 @@ import { enTranslationConstants } from "./en";
 import { frTranslationConstants } from "./fr";
 import { esTranslationConstants } from "./es";
 import { hiTranslationConstants } from "./hi";
+import { jpTranslationConstants } from "./jp"; // Import Japanese translations
 
-const isDev = import.meta.env.MODE === "development"; 
+const isDev = import.meta.env.MODE === "development";
 
 i18n
   .use(LanguageDetector)
@@ -27,6 +28,9 @@ i18n
       },
       es: {
         translation: esTranslationConstants,
+      },
+      jp: {
+        translation: jpTranslationConstants, // Add Japanese translations
       },
     },
   });

@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import './LanguageSelector.css';
+import React, { useState } from "react";
+import "./LanguageSelector.css";
 
 const languages = [
-  { code: 'en', label: 'English' },
-  { code: 'hi', label: 'Hindi' },
-  { code: 'fr', label: 'Spanish' },
-  { code: 'es', label: 'French' },
+  { code: "en", label: "English" },
+  { code: "hi", label: "Hindi" },
+  { code: "fr", label: "Spanish" },
+  { code: "es", label: "French" },
+  { code: "jp", label: "Japanese" },
 ];
 
-const LanguageSelector = ({ defaultLanguage = 'en', onChange }) => {
+const LanguageSelector = ({ defaultLanguage = "en", onChange }) => {
   const [selected, setSelected] = useState(defaultLanguage);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -20,9 +21,11 @@ const LanguageSelector = ({ defaultLanguage = 'en', onChange }) => {
 
   return (
     <div className="language-selector">
-      <div className="language-selector-header" onClick={() => setIsOpen(!isOpen)}>
+      <div
+        className="language-selector-header"
+        onClick={() => setIsOpen(!isOpen)}
+      >
         {languages.find((lang) => lang.code === selected)?.label}
-        <span className="arrow">{isOpen ? '▲' : '▼'}</span>
       </div>
 
       {isOpen && (
@@ -30,7 +33,9 @@ const LanguageSelector = ({ defaultLanguage = 'en', onChange }) => {
           {languages.map((lang) => (
             <li
               key={lang.code}
-              className={`language-selector-item ${selected === lang.code ? 'selected' : ''}`}
+              className={`language-selector-item ${
+                selected === lang.code ? "selected" : ""
+              }`}
               onClick={() => handleSelect(lang)}
             >
               {lang.label}
