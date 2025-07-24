@@ -43,8 +43,11 @@
 }
 
 .language-selector-item {
-  padding: 10px 15px;
+  padding: 6px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   transition: background 0.2s ease;
 }
 
