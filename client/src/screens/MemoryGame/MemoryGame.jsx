@@ -180,6 +180,7 @@ export default function MemoryGame() {
     setDropdownValue(e.target.value);
   };
 
+  //Fisher-Yates Shuffle Algorithm or Knuth Shuffle
   const shuffleArrayInPlace = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
