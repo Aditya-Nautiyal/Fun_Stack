@@ -24,6 +24,10 @@ Navigate to the server folder and run:
 - npm install --save-dev nodemon
 - npx nodemon index.js
 
+# ⚙️ Environment Variables
+
+Make sure to create a `.env` file in `client` and `.env.development`in `server`folders.
+
 # ☁️ Deployment
 
 - Frontend: Deployed on [AWS Amplify](https://main.d10rdlhirhiynh.amplifyapp.com/)
