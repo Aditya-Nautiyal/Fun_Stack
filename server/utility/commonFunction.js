@@ -8,6 +8,12 @@ const validateEmail = (text) => {
   return true;
 };
 
+// Validate password strength
+// - At least one uppercase letter
+// - At least one number
+// - At least one special character
+// - At least 8 characters long
+// Returns an object with validation results
 const validatePassword = (text) => {
   return {
     hasUpperCase: /[A-Z]/.test(text),
