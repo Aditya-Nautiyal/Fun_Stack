@@ -32,6 +32,10 @@ import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import { toast } from "react-toastify";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
+import noMatchSound from "../../assets/sounds/noMatchSound.mp3";
+import matchSound from "../../assets/sounds/matchSound.mp3";
+import gameCompletion from "../../assets/sounds/gameCompletion.mp3";
+
 const INITIAL_MINUTES = 5;
 const INITIAL_SECONDS = 0;
 
@@ -40,6 +44,10 @@ export default function MemoryGame() {
   const tokenDetails = useJwt(token);
   const divRef = useRef(null); // Create a ref for the div
   const footerRef = useRef(null); // Create a ref for the div
+  const noMatchAudioRef = useRef(new Audio(noMatchSound));
+  const matchAudioRef = useRef(new Audio(matchSound));
+  const completionAudioRef = useRef(new Audio(gameCompletion));
+
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -95,6 +103,9 @@ export default function MemoryGame() {
       checkPairArray.length === 2 &&
       checkPairArray[0] !== checkPairArray[1]
     ) {
+      // 🔊 PLAY NO MATCH SOUND
+      noMatchAudioRef.current.currentTime = 0;
+      noMatchAudioRef.current.play();
       setTimeout(() => {
         setSelectedItems(
           selectedItems.filter(
@@ -108,6 +119,9 @@ export default function MemoryGame() {
       checkPairArray.length === 2 &&
       checkPairArray[0] === checkPairArray[1]
     ) {
+      // 🔊 PLAY MATCH SOUND
+      matchAudioRef.current.currentTime = 0;
+      matchAudioRef.current.play();
       setItems(
         items.map((item) =>
           checkPairArray.includes(item.comparingValue)
@@ -119,6 +133,9 @@ export default function MemoryGame() {
     }
     const allFlipped = items.every((item) => item.finalCheck === true);
     if (allFlipped && items.length > 0) {
+      // 🔊 PLAY GAME COMPLETION SOUND
+      completionAudioRef.current.currentTime = 0;
+      completionAudioRef.current.play();
       setIsAllFlipped(true);
       setIsRunning(false);
     }
@@ -152,6 +169,8 @@ export default function MemoryGame() {
       setItems((item) =>
         item.id === ele.id ? { ...item, visible: false } : item
       );
+      console.log("same item clicked");
+
       setCheckPairArray([]);
     } else if (ele.finalCheck === false) {
       setSelectedItems([...selectedItems, ele]);
