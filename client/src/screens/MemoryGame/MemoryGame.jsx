@@ -66,6 +66,7 @@ export default function MemoryGame() {
   const [highScoreList, setHighScoreList] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [dropdownValue, setDropdownValue] = useState("4"); // State to store the height
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [options] = useState([
     {
       label: FOUR_BY_FOUR,
@@ -103,9 +104,12 @@ export default function MemoryGame() {
       checkPairArray.length === 2 &&
       checkPairArray[0] !== checkPairArray[1]
     ) {
-      // 🔊 PLAY NO MATCH SOUND
-      noMatchAudioRef.current.currentTime = 0;
-      noMatchAudioRef.current.play();
+      if (isSoundEnabled) {
+        // 🔊 PLAY NO MATCH SOUND
+        noMatchAudioRef.current.currentTime = 0;
+        noMatchAudioRef.current.play();
+      }
+
       setTimeout(() => {
         setSelectedItems(
           selectedItems.filter(
@@ -119,9 +123,12 @@ export default function MemoryGame() {
       checkPairArray.length === 2 &&
       checkPairArray[0] === checkPairArray[1]
     ) {
-      // 🔊 PLAY MATCH SOUND
-      matchAudioRef.current.currentTime = 0;
-      matchAudioRef.current.play();
+      if (isSoundEnabled) {
+        // 🔊 PLAY MATCH SOUND
+        matchAudioRef.current.currentTime = 0;
+        matchAudioRef.current.play();
+      }
+
       setItems(
         items.map((item) =>
           checkPairArray.includes(item.comparingValue)
@@ -133,9 +140,13 @@ export default function MemoryGame() {
     }
     const allFlipped = items.every((item) => item.finalCheck === true);
     if (allFlipped && items.length > 0) {
-      // 🔊 PLAY GAME COMPLETION SOUND
-      completionAudioRef.current.currentTime = 0;
-      completionAudioRef.current.play();
+
+      if (isSoundEnabled) {
+        // 🔊 PLAY GAME COMPLETION SOUND
+        completionAudioRef.current.currentTime = 0;
+        completionAudioRef.current.play();
+      }
+
       setIsAllFlipped(true);
       setIsRunning(false);
     }
@@ -343,6 +354,12 @@ export default function MemoryGame() {
         <div className="headerContent">
           <div className="mGameTitle">{FUN_STACK}</div>
           <div className="mGameHeaderButtonWrapper">
+            <button
+              className="logout-button"
+              onClick={() => setIsSoundEnabled((prev) => !prev)}
+            >
+              {isSoundEnabled ? "Sound ON 🔊" : "Sound OFF 🔇"}
+            </button>
             <select
               id="options"
               className="styled-select"
