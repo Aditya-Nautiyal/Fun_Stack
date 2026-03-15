@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useJwt } from "react-jwt";
 import { db } from "../../firebase/firebase.js";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
@@ -278,13 +278,13 @@ export default function MemoryGame() {
     if (!isOverlayOpen) {
       const collectionName =
         dropdownValue === "4" ? "scoreForFour" : "scoreForSix";
-      const scoresRef = collection(db, collectionName);
 
-      // Start listening when opening overlay
-      const unsubscribe = onSnapshot(scoresRef, (snapshot) => {
-        const scores = snapshot.docs.map((doc) => doc.data());
-        const sorted = scores.sort((a, b) => b.score - a.score);
-        setHighScoreList(sorted);
+      const scoresRef = collection(db, collectionName);
+      const q = query(scoresRef, orderBy("score", "desc"), limit(10));
+      // Start listening when opening overlay (top 10 only)
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const top10 = snapshot.docs.map((doc) => doc.data());
+        setHighScoreList(top10);
       });
 
       // Store unsubscribe if needed later
