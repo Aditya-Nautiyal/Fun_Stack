@@ -37,4 +37,13 @@ export const fetchHighScore = async (url: string, body: any) => {
   }
 };
 
+export const fetchFriendList = async () => {
+  try {
+    const result = await axiosInstance.get("/friend/list");
+    return result;
+  } catch (err) {
+    return err;
+  }
+};
+
 export const urlGenerator = (endURL: string) => `${API_BASE_URL}${endURL}`;

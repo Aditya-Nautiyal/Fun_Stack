@@ -10,6 +10,7 @@ const { db } = require("./firebaseAdmin");
 const EmployeeModel = require("./models/Employee.js");
 const ScoreModelForFour = require("./models/ScoreForFour.js");
 const ScoreModelForSix = require("./models/ScoreForSix.js");
+const FriendshipModel = require("./models/Friendship.js");
 const authenticate = require("./middlewares/authenticate.js");
 
 const {
@@ -211,6 +212,83 @@ app.post("/getHighScore", authenticate, async (req, res) => {
       statusCode: DEFAULT_ERROR,
       desc: INTERNAL_SERVER_ERROR,
     });
+  }
+});
+
+// Send a friend request
+app.post("/friend/request", authenticate, async (req, res) => {
+  const { recipient } = req.body;
+  const requester = req.user.username; // email from JWT
+  if (!recipient || requester === recipient) {
+    return res.status(400).json({ message: "Invalid recipient." });
+  }
+  try {
+    // Check if already friends or pending
+    const existing = await FriendshipModel.findOne({
+      $or: [
+        { requester, recipient },
+        { requester: recipient, recipient: requester },
+      ],
+      status: { $in: ["pending", "accepted"] },
+    });
+    if (existing) {
+      return res.status(409).json({ message: "Already friends or pending." });
+    }
+    await FriendshipModel.create({ requester, recipient, status: "pending" });
+    res.json({ message: "Friend request sent." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+// Accept or reject a friend request
+app.post("/friend/respond", authenticate, async (req, res) => {
+  const { requester, action } = req.body; // action: "accept" or "reject"
+  const recipient = req.user.username;
+  if (!requester || !["accept", "reject"].includes(action)) {
+    return res.status(400).json({ message: "Invalid input." });
+  }
+  try {
+    const friendship = await FriendshipModel.findOne({ requester, recipient, status: "pending" });
+    if (!friendship) {
+      return res.status(404).json({ message: "Request not found." });
+    }
+    friendship.status = action === "accept" ? "accepted" : "rejected";
+    await friendship.save();
+    res.json({ message: `Request ${action}ed.` });
+  } catch (err) {
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+// Get friend list (accepted only)
+app.get("/friend/list", authenticate, async (req, res) => {
+  const user = req.user.username;
+  try {
+    const friends = await FriendshipModel.find({
+      $or: [
+        { requester: user, status: "accepted" },
+        { recipient: user, status: "accepted" },
+      ],
+    });
+    // Return the other user's email for each friendship
+    const friendEmails = friends.map(f =>
+      f.requester === user ? f.recipient : f.requester
+    );
+    res.json({ friends: friendEmails });
+  } catch (err) {
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+// Get pending friend requests (received)
+app.get("/friend/requests", authenticate, async (req, res) => {
+  const user = req.user.username;
+  try {
+    const requests = await FriendshipModel.find({ recipient: user, status: "pending" });
+    res.json({ requests });
+  } catch (err) {
+    res.status(500).json({ message: "Server error." });
   }
 });
 

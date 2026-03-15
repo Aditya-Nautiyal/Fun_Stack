@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useJwt } from "react-jwt";
 import { db } from "../../firebase/firebase.js";
+import { doc, getDoc, collection as fbCollection, query as fbQuery, where, orderBy as fbOrderBy, limit as fbLimit, getDocs } from "firebase/firestore";
 import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
@@ -8,6 +9,7 @@ import {
   submitScore,
   fetchHighScore,
   urlGenerator,
+  fetchFriendList,
 } from "../../services/apiCall.tsx";
 import {
   FUN_STACK,
@@ -65,11 +67,57 @@ export default function MemoryGame() {
   const [isOverlayOpen, setOverlayOpen] = useState(false);
   const [isFriendOverlayOpen, setFriendOverlayOpen] = useState(false);
   const [friendList, setFriendList] = useState([]); // Placeholder for friend data
-    // Handler to open/close friend list overlay
-    const toggleFriendOverlay = () => {
-      setFriendOverlayOpen((prev) => !prev);
-      // In a real app, fetch friend list here
-    };
+  // Handler to open/close friend list overlay
+  const fetchFriendStatusAndScore = async (email, matrixSize = "4") => {
+    // Online status: Assume a Firestore doc at users/{email} with { online: true/false }
+    let online = false;
+    try {
+      const userDoc = await getDoc(doc(db, "users", email));
+      if (userDoc.exists()) {
+        online = !!userDoc.data().online;
+      }
+    } catch {}
+
+    // High score: Query scoreForFour or scoreForSix, order by score desc, limit 1
+    let highScore = null;
+    try {
+      const collectionName = matrixSize === "4" ? "scoreForFour" : "scoreForSix";
+      const q = fbQuery(
+        fbCollection(db, collectionName),
+        where("email", "==", email),
+        fbOrderBy("score", "desc"),
+        fbLimit(1)
+      );
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        highScore = snap.docs[0].data().score;
+      }
+    } catch {}
+    return { online, highScore };
+  };
+
+  const toggleFriendOverlay = async () => {
+    if (!isFriendOverlayOpen) {
+      try {
+        const res = await fetchFriendList();
+        if (res?.data?.friends) {
+          // Fetch online status and high score for each friend
+          const friendData = await Promise.all(
+            res.data.friends.map(async (email) => {
+              const { online, highScore } = await fetchFriendStatusAndScore(email, dropdownValue);
+              return { email, online, highScore };
+            })
+          );
+          setFriendList(friendData);
+        } else {
+          setFriendList([]);
+        }
+      } catch (err) {
+        setFriendList([]);
+      }
+    }
+    setFriendOverlayOpen((prev) => !prev);
+  };
   const [highScoreList, setHighScoreList] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [dropdownValue, setDropdownValue] = useState("4"); // State to store the height
