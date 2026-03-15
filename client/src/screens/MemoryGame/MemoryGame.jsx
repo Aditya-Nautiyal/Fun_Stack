@@ -63,6 +63,13 @@ export default function MemoryGame() {
   const [isAllFlipped, setIsAllFlipped] = useState(false);
   const [stoppageTime, setStoppageTime] = useState("");
   const [isOverlayOpen, setOverlayOpen] = useState(false);
+  const [isFriendOverlayOpen, setFriendOverlayOpen] = useState(false);
+  const [friendList, setFriendList] = useState([]); // Placeholder for friend data
+    // Handler to open/close friend list overlay
+    const toggleFriendOverlay = () => {
+      setFriendOverlayOpen((prev) => !prev);
+      // In a real app, fetch friend list here
+    };
   const [highScoreList, setHighScoreList] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [dropdownValue, setDropdownValue] = useState("4"); // State to store the height
@@ -348,6 +355,39 @@ export default function MemoryGame() {
     }
   };
 
+  const friendListUI = () => <Overlay
+          headerTitle="Friend List"
+          buttonTitle={CLOSE_CAPS}
+          content={
+            <div>
+              <SpaceFiller margin="20px" />
+              <div className="overlay-content-table">
+                <div className="overlay-table-header1">Email</div>
+                <div className="overlay-table-header2">Status</div>
+                <div className="overlay-table-header2">High Score</div>
+              </div>
+              <SpaceFiller margin="20px" />
+              {friendList.length === 0 ? (
+                <div>No friends yet.</div>
+              ) : (
+                friendList.map((friend, idx) => (
+                  <div key={idx} className={`overlay-content-table ${idx % 2 === 0 ? "grey-backgroud" : ""}`}>
+                    <div className="overlay-table-column1">{friend.email}</div>
+                    <div className="overlay-table-column2">
+                      <span style={{ color: friend.online ? 'green' : 'gray', fontWeight: 'bold' }}>
+                        {friend.online ? 'Online' : 'Offline'}
+                      </span>
+                    </div>
+                    <div className="overlay-table-column2">{friend.highScore ?? '-'}</div>
+                  </div>
+                ))
+              )}
+              <SpaceFiller margin="20px" />
+            </div>
+          }
+          onClose={toggleFriendOverlay}
+        />
+    
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>
@@ -359,6 +399,13 @@ export default function MemoryGame() {
               onClick={() => setIsSoundEnabled((prev) => !prev)}
             >
               {isSoundEnabled ? "Sound ON 🔊" : "Sound OFF 🔇"}
+            </button>
+            <button
+              className="logout-button"
+              style={{ backgroundColor: '#007bff' }}
+              onClick={toggleFriendOverlay}
+            >
+              Friend List
             </button>
             <select
               id="options"
@@ -423,6 +470,7 @@ export default function MemoryGame() {
           onClose={toggleOverlay}
         />
       )}
+      {isFriendOverlayOpen && friendListUI()}
     </div>
   );
 }
