@@ -55,6 +55,7 @@ import { useNavigate } from "react-router-dom";
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import Loader from "../../components/loader/Loader.jsx";
 import ProgressBar from "../../components/progressBar/ProgressBar.jsx";
+import Dropdown from "../../components/dropdown/Dropdown.jsx";
 import { toast } from "react-toastify";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
@@ -586,20 +587,11 @@ export default function MemoryGame() {
             >
               {FRIEND_LIST_TITLE}
             </button>
-            <select
-              id="options"
-              className="styled-select"
-              onChange={(e) => onDropdownSelect(e)}
-            >
-              {options.map((ele, index) => (
-                <option
-                  key={`${index}${JSON.stringify(ele)}`}
-                  value={ele.value}
-                >
-                  {ele.label}
-                </option>
-              ))}
-            </select>
+            <Dropdown
+              options={options}
+              value={dropdownValue}
+              onChange={(val) => onDropdownSelect({ target: { value: val } })}
+            />
             <button className="logout-button" onClick={onLogOutClick}>
               {LOGOUT}
             </button>
