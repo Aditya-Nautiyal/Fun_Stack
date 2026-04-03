@@ -59,20 +59,27 @@
   font-family: sans-serif;
   font-size: 20px;
   font-weight: bold;
-  color: black; /* Dark color for text */
+  color: black;
+  /* Dark color for text */
   padding-left: 20px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  /* Subtle shadow */
 }
 
 .styled-select {
   font-family: sans-serif;
   background-color: #e69500;
-  font-size: 14px; /* Font size */
+  font-size: 14px;
+  /* Font size */
   font-weight: bold;
-  border: none; /* Remove default border */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s ease; /* Smooth transition */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  border: none;
+  /* Remove default border */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  /* Smooth transition */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Subtle shadow */
   background-color: white;
   font-weight: bold;
   color: #333;
@@ -85,6 +92,7 @@
   border: 2px solid black;
   outline: none;
 }
+
 .mGameHeaderButtonWrapper {
   display: flex;
   align-items: center;
@@ -103,7 +111,8 @@
 }
 
 .mGameCircle {
-  width: 50px; /* Adjust size as needed */
+  width: 50px;
+  /* Adjust size as needed */
   height: 50px;
   border-radius: 50%;
   display: flex;
@@ -118,9 +127,12 @@
 
 /* Hover effect */
 .mGameCircle:hover {
-  background-color: #274b7a; /* Change color on hover */
-  border-color: black; /* Add border color on hover */
-  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
+  background-color: #274b7a;
+  /* Change color on hover */
+  border-color: black;
+  /* Add border color on hover */
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3);
+  /* Enhance shadow on hover */
   cursor: pointer;
 }
 
@@ -143,11 +155,14 @@
 .mGameCircle .back {
   font-family: sans-serif;
   transform: rotateY(180deg);
-  background-color: #b0c4d9; /* Style for the flipped side */
-  width: 50px; /* Adjust size as needed */
+  background-color: #b0c4d9;
+  /* Style for the flipped side */
+  width: 50px;
+  /* Adjust size as needed */
   height: 50px;
   border-radius: 50%;
-  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3);
+  /* Enhance shadow on hover */
   border: 1px solid black;
 }
 
@@ -168,22 +183,29 @@
   font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
-  color: white; /* Dark text color */
-  background-color: #ffa500; /* Light gray background */
+  color: white;
+  /* Dark text color */
+  background-color: #ffa500;
+  /* Light gray background */
   padding: 11.5px;
   border-radius: 10px;
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s ease; /* Smooth transition */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  /* Smooth transition */
   border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Subtle shadow */
   caret-color: transparent;
-  border: 2px solid black; /* Border for better visibility */
+  border: 2px solid black;
+  /* Border for better visibility */
 }
 
 .topScore-container:hover,
 .newButtonMGame:hover,
 .logout-button:hover {
-  background-color: #e69500; /* Slightly darker shade on hover */
+  background-color: #e69500;
+  /* Slightly darker shade on hover */
 }
 
 .overlay-content-table {
@@ -205,8 +227,10 @@
   font-family: sans-serif;
   font-size: 16px;
   font-weight: bold;
-  color: #333; /* Dark color for text */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  color: #333;
+  /* Dark color for text */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  /* Subtle shadow */
 }
 
 .overlay-table-column1,
@@ -218,18 +242,22 @@
 
 /* Media query for small screens */
 @media (max-width: 768px) {
+
   .headerContent,
   .mGameHeaderButtonWrapper {
-    flex-direction: column; /* Stacks the divs vertically */
+    flex-direction: column;
+    /* Stacks the divs vertically */
     gap: 2vh;
   }
+
   .mGameTitle {
     padding-left: 0px;
   }
+
   .mGameHeaderButtonWrapper {
     padding-right: 0px;
     margin-top: 20px;
-}
+  }
 }
 
 /* Friend List UI additions */

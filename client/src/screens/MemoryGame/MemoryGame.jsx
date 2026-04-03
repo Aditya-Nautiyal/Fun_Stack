@@ -54,6 +54,7 @@ import { useNavigate } from "react-router-dom";
 
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
 import Loader from "../../components/loader/Loader.jsx";
+import ProgressBar from "../../components/progressBar/ProgressBar.jsx";
 import { toast } from "react-toastify";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
@@ -559,11 +560,17 @@ export default function MemoryGame() {
     onClose={toggleFriendOverlay}
   />
 
+  const matchedCount = items.filter((item) => item.finalCheck).length;
+  const progressPercentage = itemCount > 0 ? (matchedCount / itemCount) * 100 : 0;
+
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>
         <div className="headerContent">
-          <div className="mGameTitle">{FUN_STACK}</div>
+          <div>
+            <div className="mGameTitle">{FUN_STACK}</div>
+            <ProgressBar progressPercentage={progressPercentage} />
+          </div>
           <div className="mGameHeaderButtonWrapper">
             <button
               className="logout-button"
