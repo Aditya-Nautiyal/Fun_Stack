@@ -223,6 +223,12 @@ app.post("/friend/request", authenticate, async (req, res) => {
     return res.status(400).json({ message: "Invalid recipient." });
   }
   try {
+    // Check if the recipient exists in the users collection
+    const recipientExists = await EmployeeModel.findOne({ email: recipient });
+    if (!recipientExists) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
     // Check if already friends or pending
     const existing = await FriendshipModel.findOne({
       $or: [
