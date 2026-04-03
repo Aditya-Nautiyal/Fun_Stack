@@ -26,6 +26,25 @@ export const CLOSE_CAPS = "CLOSE";
 export const TOP_SCORE_CAPS = "TOP SCORE";
 export const LOGOUT = "Logout";
 export const LOGOUT_SUCCESS = "Logout Successful";
+export const FRIEND_LIST_TITLE = "Friend List";
+export const FRIENDS_TAB = "Friends";
+export const REQUESTS_TAB = "Requests";
+export const FRIEND_EMAIL_PLACEHOLDER = "Add friend's email...";
+export const SEND_BTN = "Send";
+export const STATUS_HEADER = "Status";
+export const HIGH_SCORE_HEADER = "High Score";
+export const NO_FRIENDS = "No friends yet.";
+export const REQUESTER_HEADER = "Requester";
+export const ACTION_HEADER = "Action";
+export const NO_REQUESTS = "No pending requests.";
+export const ACCEPT_BTN = "Accept";
+export const REJECT_BTN = "Reject";
+export const ONLINE = "Online";
+export const OFFLINE = "Offline";
+export const FRIEND_REQUEST_SENT = "Friend request sent.";
+export const ERR_SENDING_REQUEST = "Error sending request";
+export const ERR_RESPONDING_REQUEST = "Error responding to request";
+export const EMAIL_HEADER = "Email";
 
 
 

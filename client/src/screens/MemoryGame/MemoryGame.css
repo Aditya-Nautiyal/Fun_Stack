@@ -229,5 +229,113 @@
   .mGameHeaderButtonWrapper {
     padding-right: 0px;
     margin-top: 20px;
-  }
+}
+}
+
+/* Friend List UI additions */
+.friend-tabs-wrapper {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+.friend-tab-btn {
+  padding: 8px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  background-color: #ccc;
+  color: black;
+  transition: all 0.3s ease;
+}
+
+.friend-tab-btn.active {
+  background-color: #ffa500;
+  color: white;
+}
+
+.friend-search-wrapper {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 15px;
+}
+
+.friend-email-input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.friend-send-btn {
+  padding: 8px 15px;
+  background-color: #e69500;
+  color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.friend-send-btn:hover {
+  background-color: #ffa500;
+}
+
+.friend-empty-state {
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.status-online {
+  color: green;
+  font-weight: bold;
+}
+
+.status-offline {
+  color: gray;
+  font-weight: bold;
+}
+
+.friend-request-row {
+  align-items: center;
+}
+
+.friend-action-wrapper {
+  display: flex;
+  gap: 5px;
+}
+
+.friend-accept-btn {
+  padding: 5px 10px;
+  background-color: green;
+  color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+}
+
+.friend-accept-btn:hover {
+  opacity: 0.8;
+}
+
+.friend-reject-btn {
+  padding: 5px 10px;
+  background-color: red;
+  color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+}
+
+.friend-reject-btn:hover {
+  opacity: 0.8;
 }

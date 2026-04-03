@@ -46,4 +46,31 @@ export const fetchFriendList = async () => {
   }
 };
 
+export const sendFriendRequest = async (recipient: string) => {
+  try {
+    const result = await axiosInstance.post("/friend/request", { recipient });
+    return result;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const fetchFriendRequests = async () => {
+  try {
+    const result = await axiosInstance.get("/friend/requests");
+    return result;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const respondFriendRequest = async (requester: string, action: "accept" | "reject") => {
+  try {
+    const result = await axiosInstance.post("/friend/respond", { requester, action });
+    return result;
+  } catch (err) {
+    return err;
+  }
+};
+
 export const urlGenerator = (endURL: string) => `${API_BASE_URL}${endURL}`;
