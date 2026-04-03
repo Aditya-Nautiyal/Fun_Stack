@@ -374,3 +374,14 @@
   align-items: center;
   min-height: 150px;
 }
+
+.game-body-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.progress-bar-wrapper {
+  margin-bottom: 20px;
+}

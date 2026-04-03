@@ -347,9 +347,16 @@ export default function MemoryGame() {
   };
 
   const bodyStruture = () => {
+    const matchedCount = items.filter((item) => item.finalCheck).length;
+    const progressPercentage = itemCount > 0 ? (matchedCount / itemCount) * 100 : 0;
+
     return (
-      <>
+      <div className="game-body-wrapper">
         {isAllFlipped ? <ConfettiExplosion className="confetti" /> : null}
+
+        <div className="progress-bar-wrapper">
+          <ProgressBar showBar={false} progressPercentage={progressPercentage} />
+        </div>
 
         <div
           className="gridBodyStructure"
@@ -376,7 +383,7 @@ export default function MemoryGame() {
             </div>
           ))}
         </div>
-      </>
+      </div>
     );
   };
 
@@ -560,17 +567,11 @@ export default function MemoryGame() {
     onClose={toggleFriendOverlay}
   />
 
-  const matchedCount = items.filter((item) => item.finalCheck).length;
-  const progressPercentage = itemCount > 0 ? (matchedCount / itemCount) * 100 : 0;
-
   return (
     <div className="parentMGameWrapper">
       <div className="header" ref={divRef}>
         <div className="headerContent">
-          <div>
-            <div className="mGameTitle">{FUN_STACK}</div>
-            <ProgressBar progressPercentage={progressPercentage} />
-          </div>
+          <div className="mGameTitle">{FUN_STACK}</div>
           <div className="mGameHeaderButtonWrapper">
             <button
               className="logout-button"

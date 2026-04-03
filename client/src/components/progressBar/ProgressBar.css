@@ -1,6 +1,5 @@
 /* Premium Progress Bar UI */
 .progress-container {
-  padding-left: 20px;
   margin-top: 8px;
   display: flex;
   flex-direction: column;
