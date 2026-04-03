@@ -339,3 +339,10 @@
 .friend-reject-btn:hover {
   opacity: 0.8;
 }
+
+.friend-loader-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 150px;
+}

@@ -53,6 +53,7 @@ import Overlay from "../../components/overlay/Overlay";
 import { useNavigate } from "react-router-dom";
 
 import SpaceFiller from "../../components/spaceFiller/SpaceFiller.jsx";
+import Loader from "../../components/loader/Loader.jsx";
 import { toast } from "react-toastify";
 import { ToastMsgStructure } from "../../components/toastMsg/ToastMsgStructure.jsx";
 
@@ -92,6 +93,7 @@ export default function MemoryGame() {
   const [friendRequests, setFriendRequests] = useState([]);
   const [friendEmailInput, setFriendEmailInput] = useState("");
   const [activeTab, setActiveTab] = useState("friends"); // "friends" or "requests"
+  const [isFriendDataLoading, setIsFriendDataLoading] = useState(false);
   // Handler to open/close friend list overlay
   const fetchFriendStatusAndScore = async (email, matrixSize = "4") => {
     // Online status: Assume a Firestore doc at users/{email} with { online: true/false }
@@ -122,6 +124,7 @@ export default function MemoryGame() {
   };
 
   const fetchFriendData = async () => {
+    setIsFriendDataLoading(true);
     try {
       const res = await fetchFriendList();
       if (res?.data?.friends) {
@@ -146,6 +149,8 @@ export default function MemoryGame() {
     } catch (err) {
       setFriendList([]);
       setFriendRequests([]);
+    } finally {
+      setIsFriendDataLoading(false);
     }
   };
 
@@ -479,7 +484,11 @@ export default function MemoryGame() {
         </div>
         <SpaceFiller margin="15px" />
 
-        {activeTab === 'friends' ? (
+        {isFriendDataLoading ? (
+          <div className="friend-loader-wrapper">
+            <Loader />
+          </div>
+        ) : activeTab === 'friends' ? (
           <>
             <div className="friend-search-wrapper">
               <input
