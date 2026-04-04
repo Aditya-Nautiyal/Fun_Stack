@@ -1,8 +1,23 @@
 import { useRef, useEffect, useState } from "react";
 import { useJwt } from "react-jwt";
 import { db } from "../../firebase/firebase.js";
-import { doc, getDoc, collection as fbCollection, query as fbQuery, where, orderBy as fbOrderBy, limit as fbLimit, getDocs } from "firebase/firestore";
-import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection as fbCollection,
+  query as fbQuery,
+  where,
+  orderBy as fbOrderBy,
+  limit as fbLimit,
+  getDocs,
+} from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
@@ -11,8 +26,8 @@ import {
   urlGenerator,
   fetchFriendList,
   sendFriendRequest,
-  fetchFriendRequests,
   respondFriendRequest,
+  listenToFriendRequests,
 } from "../../services/apiCall.tsx";
 import {
   FUN_STACK,
@@ -44,7 +59,7 @@ import {
   FRIEND_REQUEST_SENT,
   ERR_SENDING_REQUEST,
   ERR_RESPONDING_REQUEST,
-  EMAIL_HEADER
+  EMAIL_HEADER,
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -93,6 +108,7 @@ export default function MemoryGame() {
   const [isFriendOverlayOpen, setFriendOverlayOpen] = useState(false);
   const [friendList, setFriendList] = useState([]); // Placeholder for friend data
   const [friendRequests, setFriendRequests] = useState([]);
+  const friendRequestsUnsubRef = useRef(null);
   const [friendEmailInput, setFriendEmailInput] = useState("");
   const [activeTab, setActiveTab] = useState("friends"); // "friends" or "requests"
   const [isFriendDataLoading, setIsFriendDataLoading] = useState(false);
@@ -105,52 +121,48 @@ export default function MemoryGame() {
       if (userDoc.exists()) {
         online = !!userDoc.data().online;
       }
-    } catch { }
+    } catch {}
 
     // High score: Query scoreForFour or scoreForSix, order by score desc, limit 1
     let highScore = null;
     try {
-      const collectionName = matrixSize === "4" ? "scoreForFour" : "scoreForSix";
+      const collectionName =
+        matrixSize === "4" ? "scoreForFour" : "scoreForSix";
       const q = fbQuery(
         fbCollection(db, collectionName),
         where("email", "==", email),
         fbOrderBy("score", "desc"),
-        fbLimit(1)
+        fbLimit(1),
       );
       const snap = await getDocs(q);
       if (!snap.empty) {
         highScore = snap.docs[0].data().score;
       }
-    } catch { }
+    } catch {}
     return { online, highScore };
   };
 
-  const fetchFriendData = async () => {
+  const fetchFriendData = async (userEmailParam) => {
     setIsFriendDataLoading(true);
     try {
-      const res = await fetchFriendList();
-      if (res?.data?.friends) {
+      const res = await fetchFriendList(userEmailParam);
+      if (res?.friends) {
         // Fetch online status and high score for each friend
         const friendData = await Promise.all(
-          res.data.friends.map(async (email) => {
-            const { online, highScore } = await fetchFriendStatusAndScore(email, dropdownValue);
+          res.friends.map(async (email) => {
+            const { online, highScore } = await fetchFriendStatusAndScore(
+              email,
+              dropdownValue,
+            );
             return { email, online, highScore };
-          })
+          }),
         );
         setFriendList(friendData);
       } else {
         setFriendList([]);
       }
-
-      const reqRes = await fetchFriendRequests();
-      if (reqRes?.data?.requests) {
-        setFriendRequests(reqRes.data.requests);
-      } else {
-        setFriendRequests([]);
-      }
     } catch (err) {
       setFriendList([]);
-      setFriendRequests([]);
     } finally {
       setIsFriendDataLoading(false);
     }
@@ -158,32 +170,46 @@ export default function MemoryGame() {
 
   const toggleFriendOverlay = async () => {
     if (!isFriendOverlayOpen) {
-      await fetchFriendData();
+      await fetchFriendData(userEmail);
+      // Set up Firestore real-time listener for friend requests
+      if (userEmail && !friendRequestsUnsubRef.current) {
+        friendRequestsUnsubRef.current = listenToFriendRequests(
+          userEmail,
+          (requests) => {
+            setFriendRequests(requests);
+          },
+        );
+      }
     } else {
       setFriendEmailInput("");
       setActiveTab("friends");
+      // Remove Firestore listener when overlay closes
+      if (friendRequestsUnsubRef.current) {
+        friendRequestsUnsubRef.current();
+        friendRequestsUnsubRef.current = null;
+      }
     }
     setFriendOverlayOpen((prev) => !prev);
   };
 
   const handleSendRequest = async () => {
     if (!friendEmailInput) return;
-    const res = await sendFriendRequest(friendEmailInput);
-    if (res?.data?.message === FRIEND_REQUEST_SENT) {
-      toast.success(res.data.message, ToastMsgStructure);
+    const res = await sendFriendRequest(friendEmailInput, userEmail);
+    if (res?.message === FRIEND_REQUEST_SENT) {
+      toast.success(res.message, ToastMsgStructure);
       setFriendEmailInput("");
     } else {
-      toast.error(res?.response?.data?.message || ERR_SENDING_REQUEST, ToastMsgStructure);
+      toast.error(res?.error || ERR_SENDING_REQUEST, ToastMsgStructure);
     }
   };
 
-  const handleResponse = async (requester, action) => {
-    const res = await respondFriendRequest(requester, action);
-    if (res?.data?.message) {
-      toast.success(res.data.message, ToastMsgStructure);
-      await fetchFriendData(); // refresh lists
+  // Firestore-based accept/reject handler
+  const handleResponse = async (requestId, action) => {
+    const res = await respondFriendRequest(requestId, action);
+    if (res?.message) {
+      toast.success(res.message, ToastMsgStructure);
     } else {
-      toast.error(ERR_RESPONDING_REQUEST, ToastMsgStructure);
+      toast.error(res?.error || ERR_RESPONDING_REQUEST, ToastMsgStructure);
     }
   };
 
@@ -207,6 +233,16 @@ export default function MemoryGame() {
       setUserEmail(tokenDetails?.decodedToken?.username);
     }
   }, [tokenDetails]);
+
+  // Clean up Firestore listener on unmount
+  useEffect(() => {
+    return () => {
+      if (friendRequestsUnsubRef.current) {
+        friendRequestsUnsubRef.current();
+        friendRequestsUnsubRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (divRef.current) {
@@ -237,8 +273,8 @@ export default function MemoryGame() {
       setTimeout(() => {
         setSelectedItems(
           selectedItems.filter(
-            (item) => !checkPairArray.includes(item.comparingValue)
-          )
+            (item) => !checkPairArray.includes(item.comparingValue),
+          ),
         );
 
         setCheckPairArray([]);
@@ -257,14 +293,13 @@ export default function MemoryGame() {
         items.map((item) =>
           checkPairArray.includes(item.comparingValue)
             ? { ...item, finalCheck: true }
-            : item
-        )
+            : item,
+        ),
       );
       setCheckPairArray([]);
     }
     const allFlipped = items.every((item) => item.finalCheck === true);
     if (allFlipped && items.length > 0) {
-
       if (isSoundEnabled) {
         // 🔊 PLAY GAME COMPLETION SOUND
         completionAudioRef.current.currentTime = 0;
@@ -302,7 +337,7 @@ export default function MemoryGame() {
     ) {
       setSelectedItems(selectedItems.filter((item) => item.id !== ele.id));
       setItems((item) =>
-        item.id === ele.id ? { ...item, visible: false } : item
+        item.id === ele.id ? { ...item, visible: false } : item,
       );
       console.log("same item clicked");
 
@@ -310,7 +345,7 @@ export default function MemoryGame() {
     } else if (ele.finalCheck === false) {
       setSelectedItems([...selectedItems, ele]);
       setItems((item) =>
-        item.id === ele.id ? { ...item, visible: true } : item
+        item.id === ele.id ? { ...item, visible: true } : item,
       );
       setCheckPairArray([...checkPairArray, ele.comparingValue]);
     }
@@ -349,14 +384,18 @@ export default function MemoryGame() {
 
   const bodyStruture = () => {
     const matchedCount = items.filter((item) => item.finalCheck).length;
-    const progressPercentage = itemCount > 0 ? (matchedCount / itemCount) * 100 : 0;
+    const progressPercentage =
+      itemCount > 0 ? (matchedCount / itemCount) * 100 : 0;
 
     return (
       <div className="game-body-wrapper">
         {isAllFlipped ? <ConfettiExplosion className="confetti" /> : null}
 
         <div className="progress-bar-wrapper">
-          <ProgressBar showBar={false} progressPercentage={progressPercentage} />
+          <ProgressBar
+            showBar={false}
+            progressPercentage={progressPercentage}
+          />
         </div>
 
         <div
@@ -371,10 +410,11 @@ export default function MemoryGame() {
               onClick={() => cirleClicked(ele)}
             >
               <div
-                className={`mGameCircle ${selectedItems.some((item) => item.id === ele.id)
-                  ? "is-flipped"
-                  : ""
-                  }`}
+                className={`mGameCircle ${
+                  selectedItems.some((item) => item.id === ele.id)
+                    ? "is-flipped"
+                    : ""
+                }`}
               >
                 {/* Initial button content */}
                 <div className="front" />
@@ -440,8 +480,9 @@ export default function MemoryGame() {
           {highScoreList.map((ele, i) => (
             <div key={`${i}_${JSON.stringify(ele)}`}>
               <div
-                className={`overlay-content-table ${i % 2 === 0 ? "grey-backgroud" : ""
-                  }`}
+                className={`overlay-content-table ${
+                  i % 2 === 0 ? "grey-backgroud" : ""
+                }`}
               >
                 <div className="overlay-table-column1">{ele.email}</div>
                 <div className="overlay-table-column2">
@@ -461,8 +502,9 @@ export default function MemoryGame() {
   const scoreFormatter = (seconds) => {
     const minutes = Math.floor(seconds / 60); // Get the minutes
     const remainingSeconds = seconds % 60; // Get the remaining seconds
-    return `${minutes} min ${remainingSeconds < 10 ? "0" : ""
-      }${remainingSeconds} sec`;
+    return `${minutes} min ${
+      remainingSeconds < 10 ? "0" : ""
+    }${remainingSeconds} sec`;
   };
 
   const onLogOutClick = () => {
@@ -476,97 +518,118 @@ export default function MemoryGame() {
     }
   };
 
-  const friendListUI = () => <Overlay
-    headerTitle={FRIEND_LIST_TITLE}
-    buttonTitle={CLOSE_CAPS}
-    content={
-      <div>
-        <div className="friend-tabs-wrapper">
-          <button
-            className={`friend-tab-btn ${activeTab === 'friends' ? 'active' : ''}`}
-            onClick={() => setActiveTab('friends')}
-          >{FRIENDS_TAB} ({friendList?.length || 0})</button>
-          <button
-            className={`friend-tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
-            onClick={() => setActiveTab('requests')}
-          >{REQUESTS_TAB} ({friendRequests?.length || 0})</button>
-        </div>
-        <SpaceFiller margin="15px" />
-
-        {isFriendDataLoading ? (
-          <div className="friend-loader-wrapper">
-            <Loader />
+  const friendListUI = () => (
+    <Overlay
+      headerTitle={FRIEND_LIST_TITLE}
+      buttonTitle={CLOSE_CAPS}
+      content={
+        <div>
+          <div className="friend-tabs-wrapper">
+            <button
+              className={`friend-tab-btn ${activeTab === "friends" ? "active" : ""}`}
+              onClick={() => setActiveTab("friends")}
+            >
+              {FRIENDS_TAB} ({friendList?.length || 0})
+            </button>
+            <button
+              className={`friend-tab-btn ${activeTab === "requests" ? "active" : ""}`}
+              onClick={() => setActiveTab("requests")}
+            >
+              {REQUESTS_TAB} ({friendRequests?.length || 0})
+            </button>
           </div>
-        ) : activeTab === 'friends' ? (
-          <>
-            <div className="friend-search-wrapper">
-              <input
-                type="email"
-                placeholder={FRIEND_EMAIL_PLACEHOLDER}
-                className="friend-email-input"
-                value={friendEmailInput}
-                onChange={(e) => setFriendEmailInput(e.target.value)}
-              />
-              <button
-                className="friend-send-btn"
-                onClick={handleSendRequest}
-              >{SEND_BTN}</button>
+          <SpaceFiller margin="15px" />
+
+          {isFriendDataLoading ? (
+            <div className="friend-loader-wrapper">
+              <Loader />
             </div>
-            <div className="overlay-content-table">
-              <div className="overlay-table-header1">{EMAIL_HEADER}</div>
-              <div className="overlay-table-header2">{STATUS_HEADER}</div>
-              <div className="overlay-table-header2">{HIGH_SCORE_HEADER}</div>
-            </div>
-            <SpaceFiller margin="10px" />
-            {friendList.length === 0 ? (
-              <div className="friend-empty-state">{NO_FRIENDS}</div>
-            ) : (
-              friendList.map((friend, idx) => (
-                <div key={idx} className={`overlay-content-table ${idx % 2 === 0 ? "grey-backgroud" : ""}`}>
-                  <div className="overlay-table-column1">{friend.email}</div>
-                  <div className="overlay-table-column2">
-                    <span className={friend.online ? 'status-online' : 'status-offline'}>
-                      {friend.online ? ONLINE : OFFLINE}
-                    </span>
+          ) : activeTab === "friends" ? (
+            <>
+              <div className="friend-search-wrapper">
+                <input
+                  type="email"
+                  placeholder={FRIEND_EMAIL_PLACEHOLDER}
+                  className="friend-email-input"
+                  value={friendEmailInput}
+                  onChange={(e) => setFriendEmailInput(e.target.value)}
+                />
+                <button className="friend-send-btn" onClick={handleSendRequest}>
+                  {SEND_BTN}
+                </button>
+              </div>
+              <div className="overlay-content-table">
+                <div className="overlay-table-header1">{EMAIL_HEADER}</div>
+                <div className="overlay-table-header2">{STATUS_HEADER}</div>
+                <div className="overlay-table-header2">{HIGH_SCORE_HEADER}</div>
+              </div>
+              <SpaceFiller margin="10px" />
+              {friendList.length === 0 ? (
+                <div className="friend-empty-state">{NO_FRIENDS}</div>
+              ) : (
+                friendList.map((friend, idx) => (
+                  <div
+                    key={idx}
+                    className={`overlay-content-table ${idx % 2 === 0 ? "grey-backgroud" : ""}`}
+                  >
+                    <div className="overlay-table-column1">{friend.email}</div>
+                    <div className="overlay-table-column2">
+                      <span
+                        className={
+                          friend.online ? "status-online" : "status-offline"
+                        }
+                      >
+                        {friend.online ? ONLINE : OFFLINE}
+                      </span>
+                    </div>
+                    <div className="overlay-table-column2">
+                      {friend.highScore ?? "-"}
+                    </div>
                   </div>
-                  <div className="overlay-table-column2">{friend.highScore ?? '-'}</div>
-                </div>
-              ))
-            )}
-          </>
-        ) : (
-          <>
-            <div className="overlay-content-table">
-              <div className="overlay-table-header1">{REQUESTER_HEADER}</div>
-              <div className="overlay-table-header2">{ACTION_HEADER}</div>
-            </div>
-            <SpaceFiller margin="10px" />
-            {friendRequests.length === 0 ? (
-              <div className="friend-empty-state">{NO_REQUESTS}</div>
-            ) : (
-              friendRequests.map((req, idx) => (
-                <div key={idx} className={`overlay-content-table friend-request-row ${idx % 2 === 0 ? "grey-backgroud" : ""}`}>
-                  <div className="overlay-table-column1">{req.requester}</div>
-                  <div className="overlay-table-column2 friend-action-wrapper">
-                    <button
-                      className="friend-accept-btn"
-                      onClick={() => handleResponse(req.requester, "accept")}
-                    >{ACCEPT_BTN}</button>
-                    <button
-                      className="friend-reject-btn"
-                      onClick={() => handleResponse(req.requester, "reject")}
-                    >{REJECT_BTN}</button>
+                ))
+              )}
+            </>
+          ) : (
+            <>
+              <div className="overlay-content-table">
+                <div className="overlay-table-header1">{REQUESTER_HEADER}</div>
+                <div className="overlay-table-header2">{ACTION_HEADER}</div>
+              </div>
+              <SpaceFiller margin="10px" />
+              {friendRequests.length === 0 ? (
+                <div className="friend-empty-state">{NO_REQUESTS}</div>
+              ) : (
+                friendRequests.map((req, idx) => (
+                  <div
+                    key={req.id || idx}
+                    className={`overlay-content-table friend-request-row ${idx % 2 === 0 ? "grey-backgroud" : ""}`}
+                  >
+                    <div className="overlay-table-column1">{req.requester}</div>
+                    <div className="overlay-table-column2 friend-action-wrapper">
+                      <button
+                        className="friend-accept-btn"
+                        onClick={() => handleResponse(req.id, "accept")}
+                      >
+                        {ACCEPT_BTN}
+                      </button>
+                      <button
+                        className="friend-reject-btn"
+                        onClick={() => handleResponse(req.id, "reject")}
+                      >
+                        {REJECT_BTN}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </>
-        )}
-        <SpaceFiller margin="20px" />
-      </div>
-    }
-    onClose={toggleFriendOverlay}
-  />
+                ))
+              )}
+            </>
+          )}
+          <SpaceFiller margin="20px" />
+        </div>
+      }
+      onClose={toggleFriendOverlay}
+    />
+  );
 
   return (
     <div className="parentMGameWrapper">
@@ -582,7 +645,7 @@ export default function MemoryGame() {
             </button>
             <button
               className="logout-button"
-              style={{ backgroundColor: '#007bff' }}
+              style={{ backgroundColor: "#007bff" }}
               onClick={toggleFriendOverlay}
             >
               {FRIEND_LIST_TITLE}
