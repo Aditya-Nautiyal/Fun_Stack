@@ -329,6 +329,18 @@
   font-weight: bold;
 }
 
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 1px solid #ffeeba;
+  display: inline-block;
+}
+
 .friend-request-row {
   align-items: center;
 }

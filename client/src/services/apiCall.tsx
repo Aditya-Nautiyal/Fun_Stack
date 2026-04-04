@@ -44,27 +44,50 @@ export const respondFriendRequest = async (
 // Real-time listener for friend requests (received by user)
 
 /**
- * Listen for real-time updates to friend requests for a recipient.
- * @param recipientEmail The email of the user to listen for requests.
+ * Listen for real-time updates to friend requests (both sent and received).
+ * @param userEmail The email of the user to listen for requests.
  * @param callback Function to call with the updated requests array.
  * @returns Unsubscribe function to stop listening.
  */
 export const listenToFriendRequests = (
-  recipientEmail: string,
+  userEmail: string,
   callback: (requests: DocumentData[]) => void,
 ) => {
-  const q = query(
+  const qReceived = query(
     collection(db, "friendRequests"),
-    where("recipient", "==", recipientEmail),
+    where("recipient", "==", userEmail),
     where("status", "==", "pending"),
   );
-  return onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
-    const requests = snapshot.docs.map((doc) => ({
+  
+  const qSent = query(
+    collection(db, "friendRequests"),
+    where("requester", "==", userEmail),
+    where("status", "==", "pending"),
+  );
+
+  let receivedRequests: DocumentData[] = [];
+  let sentRequests: DocumentData[] = [];
+
+  const unsubReceived = onSnapshot(qReceived, (snapshot: QuerySnapshot<DocumentData>) => {
+    receivedRequests = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    callback(requests);
+    callback([...receivedRequests, ...sentRequests]);
   });
+
+  const unsubSent = onSnapshot(qSent, (snapshot: QuerySnapshot<DocumentData>) => {
+    sentRequests = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    callback([...receivedRequests, ...sentRequests]);
+  });
+
+  return () => {
+    unsubReceived();
+    unsubSent();
+  };
 };
 import axiosInstance from "./axiosInstance";
 import { API_BASE_URL } from "../env";
@@ -106,42 +129,76 @@ export const fetchHighScore = async (url: string, body: any) => {
 };
 
 /**
- * Fetches the list of accepted friends for a user from Firestore.
+ * Listen for real-time updates to accepted friends for a user from Firestore.
  * @param userEmail The email of the current user
+ * @param callback The function to return list of friends
  * @returns Array of friend emails
  */
-export const fetchFriendList = async (
+export const listenToFriends = (
   userEmail: string,
-): Promise<{ friends: string[] }> => {
-  if (!userEmail) return { friends: [] };
-  try {
-    // Firestore does not support $or directly, so we need two queries
-    const q1 = query(
-      collection(db, "friendRequests"),
-      where("status", "==", "accepted"),
-      where("requester", "==", userEmail),
-    );
-    const q2 = query(
-      collection(db, "friendRequests"),
-      where("status", "==", "accepted"),
-      where("recipient", "==", userEmail),
-    );
-    const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
-    const friends: string[] = [];
-    snap1.forEach((doc) => {
-      const data = doc.data();
-      if (data.recipient && data.recipient !== userEmail)
-        friends.push(data.recipient);
-    });
-    snap2.forEach((doc) => {
-      const data = doc.data();
-      if (data.requester && data.requester !== userEmail)
-        friends.push(data.requester);
-    });
-    return { friends };
-  } catch (err) {
-    return { friends: [] };
+  callback: (friends: string[]) => void,
+) => {
+  if (!userEmail) {
+    callback([]);
+    return () => {};
   }
+
+  // Firestore does not support $or directly, so we need two queries
+  const q1 = query(
+    collection(db, "friendRequests"),
+    where("status", "==", "accepted"),
+    where("requester", "==", userEmail),
+  );
+  const q2 = query(
+    collection(db, "friendRequests"),
+    where("status", "==", "accepted"),
+    where("recipient", "==", userEmail),
+  );
+
+  let friends1: string[] = [];
+  let friends2: string[] = [];
+
+  const updateFriends = () => {
+    const allFriends = Array.from(new Set([...friends1, ...friends2]));
+    callback(allFriends);
+  };
+
+  const unsub1 = onSnapshot(
+    q1,
+    (snap) => {
+      friends1 = [];
+      snap.forEach((doc) => {
+        const data = doc.data();
+        if (data.recipient && data.recipient !== userEmail)
+          friends1.push(data.recipient);
+      });
+      updateFriends();
+    },
+    (err) => {
+      console.error("Firebase Index Error (q1): ", err.message);
+    }
+  );
+
+  const unsub2 = onSnapshot(
+    q2,
+    (snap) => {
+      friends2 = [];
+      snap.forEach((doc) => {
+        const data = doc.data();
+        if (data.requester && data.requester !== userEmail)
+          friends2.push(data.requester);
+      });
+      updateFriends();
+    },
+    (err) => {
+      console.error("Firebase Index Error (q2): ", err.message);
+    }
+  );
+
+  return () => {
+    unsub1();
+    unsub2();
+  };
 };
 
 // Firestore-based friend request sender

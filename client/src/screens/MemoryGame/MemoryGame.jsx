@@ -24,7 +24,7 @@ import {
   submitScore,
   fetchHighScore,
   urlGenerator,
-  fetchFriendList,
+  listenToFriends,
   sendFriendRequest,
   respondFriendRequest,
   listenToFriendRequests,
@@ -109,6 +109,7 @@ export default function MemoryGame() {
   const [friendList, setFriendList] = useState([]); // Placeholder for friend data
   const [friendRequests, setFriendRequests] = useState([]);
   const friendRequestsUnsubRef = useRef(null);
+  const friendListUnsubRef = useRef(null);
   const [friendEmailInput, setFriendEmailInput] = useState("");
   const [activeTab, setActiveTab] = useState("friends"); // "friends" or "requests"
   const [isFriendDataLoading, setIsFriendDataLoading] = useState(false);
@@ -142,35 +143,29 @@ export default function MemoryGame() {
     return { online, highScore };
   };
 
-  const fetchFriendData = async (userEmailParam) => {
-    setIsFriendDataLoading(true);
-    try {
-      const res = await fetchFriendList(userEmailParam);
-      if (res?.friends) {
-        // Fetch online status and high score for each friend
-        const friendData = await Promise.all(
-          res.friends.map(async (email) => {
-            const { online, highScore } = await fetchFriendStatusAndScore(
-              email,
-              dropdownValue,
-            );
-            return { email, online, highScore };
-          }),
-        );
-        setFriendList(friendData);
-      } else {
-        setFriendList([]);
-      }
-    } catch (err) {
-      setFriendList([]);
-    } finally {
-      setIsFriendDataLoading(false);
-    }
-  };
-
   const toggleFriendOverlay = async () => {
     if (!isFriendOverlayOpen) {
-      await fetchFriendData(userEmail);
+      if (userEmail && !friendListUnsubRef.current) {
+        setIsFriendDataLoading(true);
+        friendListUnsubRef.current = listenToFriends(
+          userEmail,
+          async (friendEmails) => {
+            // Fetch online status and high score for each friend
+            const friendData = await Promise.all(
+              friendEmails.map(async (email) => {
+                const { online, highScore } = await fetchFriendStatusAndScore(
+                  email,
+                  dropdownValue,
+                );
+                return { email, online, highScore };
+              }),
+            );
+            setFriendList(friendData);
+            setIsFriendDataLoading(false);
+          }
+        );
+      }
+
       // Set up Firestore real-time listener for friend requests
       if (userEmail && !friendRequestsUnsubRef.current) {
         friendRequestsUnsubRef.current = listenToFriendRequests(
@@ -183,10 +178,14 @@ export default function MemoryGame() {
     } else {
       setFriendEmailInput("");
       setActiveTab("friends");
-      // Remove Firestore listener when overlay closes
+      // Remove Firestore listeners when overlay closes
       if (friendRequestsUnsubRef.current) {
         friendRequestsUnsubRef.current();
         friendRequestsUnsubRef.current = null;
+      }
+      if (friendListUnsubRef.current) {
+        friendListUnsubRef.current();
+        friendListUnsubRef.current = null;
       }
     }
     setFriendOverlayOpen((prev) => !prev);
@@ -198,6 +197,7 @@ export default function MemoryGame() {
     if (res?.message === FRIEND_REQUEST_SENT) {
       toast.success(res.message, ToastMsgStructure);
       setFriendEmailInput("");
+      setActiveTab("requests");
     } else {
       toast.error(res?.error || ERR_SENDING_REQUEST, ToastMsgStructure);
     }
@@ -240,6 +240,10 @@ export default function MemoryGame() {
       if (friendRequestsUnsubRef.current) {
         friendRequestsUnsubRef.current();
         friendRequestsUnsubRef.current = null;
+      }
+      if (friendListUnsubRef.current) {
+        friendListUnsubRef.current();
+        friendListUnsubRef.current = null;
       }
     };
   }, []);
@@ -592,7 +596,7 @@ export default function MemoryGame() {
           ) : (
             <>
               <div className="overlay-content-table">
-                <div className="overlay-table-header1">{REQUESTER_HEADER}</div>
+                <div className="overlay-table-header1">{EMAIL_HEADER}</div>
                 <div className="overlay-table-header2">{ACTION_HEADER}</div>
               </div>
               <SpaceFiller margin="10px" />
@@ -604,20 +608,28 @@ export default function MemoryGame() {
                     key={req.id || idx}
                     className={`overlay-content-table friend-request-row ${idx % 2 === 0 ? "grey-backgroud" : ""}`}
                   >
-                    <div className="overlay-table-column1">{req.requester}</div>
-                    <div className="overlay-table-column2 friend-action-wrapper">
-                      <button
-                        className="friend-accept-btn"
-                        onClick={() => handleResponse(req.id, "accept")}
-                      >
-                        {ACCEPT_BTN}
-                      </button>
-                      <button
-                        className="friend-reject-btn"
-                        onClick={() => handleResponse(req.id, "reject")}
-                      >
-                        {REJECT_BTN}
-                      </button>
+                    <div className="overlay-table-column1">
+                      {req.requester === userEmail ? req.recipient : req.requester}
+                    </div>
+                    <div className={`overlay-table-column2 ${req.requester === userEmail ? "" : "friend-action-wrapper"}`}>
+                      {req.requester === userEmail ? (
+                        <span className="status-pending">Pending</span>
+                      ) : (
+                        <>
+                          <button
+                            className="friend-accept-btn"
+                            onClick={() => handleResponse(req.id, "accept")}
+                          >
+                            {ACCEPT_BTN}
+                          </button>
+                          <button
+                            className="friend-reject-btn"
+                            onClick={() => handleResponse(req.id, "reject")}
+                          >
+                            {REJECT_BTN}
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))
