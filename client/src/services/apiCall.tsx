@@ -10,6 +10,8 @@ import {
   where,
   or,
   and,
+  setDoc,
+  getDoc,
   onSnapshot,
   QuerySnapshot,
   DocumentData,
@@ -206,3 +208,69 @@ export const sendFriendRequest = async (
 // respondFriendRequest will be replaced by Firestore logic in the next step
 
 export const urlGenerator = (endURL: string) => `${API_BASE_URL}${endURL}`;
+
+// -- USER PRESENCE ENGINE --
+
+/**
+ * Updates the online status of the current user.
+ * Triggered on mount, unmount, and via heartbeat.
+ */
+export const updateUserPresence = async (email: string, isOnline: boolean) => {
+  if (!email) return;
+  try {
+    const userRef = doc(db, "userStatus", email);
+    await setDoc(
+      userRef,
+      {
+        email: email, // Store email to easily query by it
+        online: isOnline,
+        lastActive: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  } catch (err) {
+    console.error("Presence update failed:", err);
+  }
+};
+
+/**
+ * Real-time listener for up to 10 friends' presence.
+ */
+export const listenToFriendsPresence = (
+  friendEmails: string[],
+  callback: (presenceMap: any) => void
+) => {
+  if (!friendEmails || friendEmails.length === 0) {
+    callback({});
+    return () => {};
+  }
+
+  // Firestore "in" queries support a maximum of 10 items.
+  const activeChunks = friendEmails.slice(0, 10);
+
+  const q = query(
+    collection(db, "userStatus"),
+    where("email", "in", activeChunks)
+  );
+
+  return onSnapshot(
+    q,
+    (snap) => {
+      const presenceMap: any = {};
+      const now = new Date().getTime();
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        
+        // Define online as explicitly 'true' and having a recent heartbeat (within 2 mins)
+        const lastActive = data.lastActive?.toDate().getTime() || 0;
+        const isOnline = data.online === true && (now - lastActive < 120000);
+        
+        presenceMap[docSnap.id] = isOnline;
+      });
+      callback(presenceMap);
+    },
+    (err) => {
+      console.error("Firebase Presence Listener Error: ", err.message);
+    }
+  );
+};

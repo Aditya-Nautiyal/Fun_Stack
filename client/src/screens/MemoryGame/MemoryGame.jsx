@@ -28,6 +28,8 @@ import {
   sendFriendRequest,
   respondFriendRequest,
   listenToFriendRequests,
+  updateUserPresence,
+  listenToFriendsPresence,
 } from "../../services/apiCall.tsx";
 import {
   FUN_STACK,
@@ -110,20 +112,13 @@ export default function MemoryGame() {
   const [friendRequests, setFriendRequests] = useState([]);
   const friendRequestsUnsubRef = useRef(null);
   const friendListUnsubRef = useRef(null);
+  const friendPresenceUnsubRef = useRef(null);
+  const [friendPresence, setFriendPresence] = useState({});
   const [friendEmailInput, setFriendEmailInput] = useState("");
   const [activeTab, setActiveTab] = useState("friends"); // "friends" or "requests"
   const [isFriendDataLoading, setIsFriendDataLoading] = useState(false);
   // Handler to open/close friend list overlay
   const fetchFriendStatusAndScore = async (email, matrixSize = "4") => {
-    // Online status: Assume a Firestore doc at users/{email} with { online: true/false }
-    let online = false;
-    try {
-      const userDoc = await getDoc(doc(db, "users", email));
-      if (userDoc.exists()) {
-        online = !!userDoc.data().online;
-      }
-    } catch {}
-
     // High score: Query scoreForFour or scoreForSix, order by score desc, limit 1
     let highScore = null;
     try {
@@ -140,7 +135,7 @@ export default function MemoryGame() {
         highScore = snap.docs[0].data().score;
       }
     } catch {}
-    return { online, highScore };
+    return { highScore };
   };
 
   const toggleFriendOverlay = async () => {
@@ -150,14 +145,19 @@ export default function MemoryGame() {
         friendListUnsubRef.current = listenToFriends(
           userEmail,
           async (friendEmails) => {
-            // Fetch online status and high score for each friend
+            if (friendPresenceUnsubRef.current) friendPresenceUnsubRef.current();
+            friendPresenceUnsubRef.current = listenToFriendsPresence(friendEmails, (presenceMap) => {
+              setFriendPresence(presenceMap);
+            });
+
+            // Fetch high score for each friend
             const friendData = await Promise.all(
               friendEmails.map(async (email) => {
-                const { online, highScore } = await fetchFriendStatusAndScore(
+                const { highScore } = await fetchFriendStatusAndScore(
                   email,
                   dropdownValue,
                 );
-                return { email, online, highScore };
+                return { email, highScore };
               }),
             );
             setFriendList(friendData);
@@ -186,6 +186,10 @@ export default function MemoryGame() {
       if (friendListUnsubRef.current) {
         friendListUnsubRef.current();
         friendListUnsubRef.current = null;
+      }
+      if (friendPresenceUnsubRef.current) {
+        friendPresenceUnsubRef.current();
+        friendPresenceUnsubRef.current = null;
       }
     }
     setFriendOverlayOpen((prev) => !prev);
@@ -234,6 +238,32 @@ export default function MemoryGame() {
     }
   }, [tokenDetails]);
 
+  // Set up User Presence Tracker
+  useEffect(() => {
+    if (userEmail) {
+      // Set to online immediately
+      updateUserPresence(userEmail, true);
+
+      // Heartbeat every 60 seconds
+      const interval = setInterval(() => {
+        updateUserPresence(userEmail, true);
+      }, 60000);
+
+      // Handle unmount and tab close
+      const handleUnload = () => {
+        updateUserPresence(userEmail, false);
+      };
+      
+      window.addEventListener("beforeunload", handleUnload);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener("beforeunload", handleUnload);
+        updateUserPresence(userEmail, false);
+      };
+    }
+  }, [userEmail]);
+
   // Clean up Firestore listener on unmount
   useEffect(() => {
     return () => {
@@ -244,6 +274,10 @@ export default function MemoryGame() {
       if (friendListUnsubRef.current) {
         friendListUnsubRef.current();
         friendListUnsubRef.current = null;
+      }
+      if (friendPresenceUnsubRef.current) {
+        friendPresenceUnsubRef.current();
+        friendPresenceUnsubRef.current = null;
       }
     };
   }, []);
@@ -580,10 +614,10 @@ export default function MemoryGame() {
                     <div className="overlay-table-column2">
                       <span
                         className={
-                          friend.online ? "status-online" : "status-offline"
+                          friendPresence[friend.email] ? "status-online" : "status-offline"
                         }
                       >
-                        {friend.online ? ONLINE : OFFLINE}
+                        {friendPresence[friend.email] ? ONLINE : OFFLINE}
                       </span>
                     </div>
                     <div className="overlay-table-column2">
