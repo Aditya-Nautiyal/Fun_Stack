@@ -8,6 +8,8 @@ import {
   getDocs,
   query,
   where,
+  or,
+  and,
   onSnapshot,
   QuerySnapshot,
   DocumentData,
@@ -53,41 +55,32 @@ export const listenToFriendRequests = (
   userEmail: string,
   callback: (requests: DocumentData[]) => void,
 ) => {
-  const qReceived = query(
+  const q = query(
     collection(db, "friendRequests"),
-    where("recipient", "==", userEmail),
-    where("status", "==", "pending"),
+    and(
+      where("status", "==", "pending"),
+      or(
+        where("recipient", "==", userEmail),
+        where("requester", "==", userEmail)
+      )
+    )
   );
-  
-  const qSent = query(
-    collection(db, "friendRequests"),
-    where("requester", "==", userEmail),
-    where("status", "==", "pending"),
+
+  const unsub = onSnapshot(
+    q,
+    (snapshot: QuerySnapshot<DocumentData>) => {
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(requests);
+    },
+    (err) => {
+      console.error("Firebase Friend Requests Error: ", err.message);
+    }
   );
 
-  let receivedRequests: DocumentData[] = [];
-  let sentRequests: DocumentData[] = [];
-
-  const unsubReceived = onSnapshot(qReceived, (snapshot: QuerySnapshot<DocumentData>) => {
-    receivedRequests = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    callback([...receivedRequests, ...sentRequests]);
-  });
-
-  const unsubSent = onSnapshot(qSent, (snapshot: QuerySnapshot<DocumentData>) => {
-    sentRequests = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    callback([...receivedRequests, ...sentRequests]);
-  });
-
-  return () => {
-    unsubReceived();
-    unsubSent();
-  };
+  return unsub;
 };
 import axiosInstance from "./axiosInstance";
 import { API_BASE_URL } from "../env";
@@ -143,62 +136,34 @@ export const listenToFriends = (
     return () => {};
   }
 
-  // Firestore does not support $or directly, so we need two queries
-  const q1 = query(
+  const q = query(
     collection(db, "friendRequests"),
-    where("status", "==", "accepted"),
-    where("requester", "==", userEmail),
+    and(
+      where("status", "==", "accepted"),
+      or(
+        where("requester", "==", userEmail),
+        where("recipient", "==", userEmail)
+      )
+    )
   );
-  const q2 = query(
-    collection(db, "friendRequests"),
-    where("status", "==", "accepted"),
-    where("recipient", "==", userEmail),
-  );
 
-  let friends1: string[] = [];
-  let friends2: string[] = [];
-
-  const updateFriends = () => {
-    const allFriends = Array.from(new Set([...friends1, ...friends2]));
-    callback(allFriends);
-  };
-
-  const unsub1 = onSnapshot(
-    q1,
+  const unsub = onSnapshot(
+    q,
     (snap) => {
-      friends1 = [];
+      const friends: string[] = [];
       snap.forEach((doc) => {
         const data = doc.data();
-        if (data.recipient && data.recipient !== userEmail)
-          friends1.push(data.recipient);
+        if (data.recipient && data.recipient !== userEmail) friends.push(data.recipient);
+        if (data.requester && data.requester !== userEmail) friends.push(data.requester);
       });
-      updateFriends();
+      callback(Array.from(new Set(friends)));
     },
     (err) => {
-      console.error("Firebase Index Error (q1): ", err.message);
+      console.error("Firebase Friends Index Error: ", err.message);
     }
   );
 
-  const unsub2 = onSnapshot(
-    q2,
-    (snap) => {
-      friends2 = [];
-      snap.forEach((doc) => {
-        const data = doc.data();
-        if (data.requester && data.requester !== userEmail)
-          friends2.push(data.requester);
-      });
-      updateFriends();
-    },
-    (err) => {
-      console.error("Firebase Index Error (q2): ", err.message);
-    }
-  );
-
-  return () => {
-    unsub1();
-    unsub2();
-  };
+  return unsub;
 };
 
 // Firestore-based friend request sender
