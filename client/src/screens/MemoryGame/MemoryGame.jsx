@@ -134,7 +134,7 @@ export default function MemoryGame() {
       if (!snap.empty) {
         highScore = snap.docs[0].data().score;
       }
-    } catch {}
+    } catch { }
     return { highScore };
   };
 
@@ -253,7 +253,7 @@ export default function MemoryGame() {
       const handleUnload = () => {
         updateUserPresence(userEmail, false);
       };
-      
+
       window.addEventListener("beforeunload", handleUnload);
 
       return () => {
@@ -428,8 +428,6 @@ export default function MemoryGame() {
     return (
       <div className="game-body-wrapper">
         {isAllFlipped ? <ConfettiExplosion className="confetti" /> : null}
-
-        <div className="userGreeting">Hi, {userEmail}</div>
         <div className="progress-bar-wrapper">
           <ProgressBar
             showBar={false}
@@ -449,11 +447,10 @@ export default function MemoryGame() {
               onClick={() => cirleClicked(ele)}
             >
               <div
-                className={`mGameCircle ${
-                  selectedItems.some((item) => item.id === ele.id)
-                    ? "is-flipped"
-                    : ""
-                }`}
+                className={`mGameCircle ${selectedItems.some((item) => item.id === ele.id)
+                  ? "is-flipped"
+                  : ""
+                  }`}
               >
                 {/* Initial button content */}
                 <div className="front" />
@@ -463,6 +460,8 @@ export default function MemoryGame() {
             </div>
           ))}
         </div>
+        <SpaceFiller margin="20px" />
+        <div className="userGreeting">{userEmail}</div>
       </div>
     );
   };
@@ -519,9 +518,8 @@ export default function MemoryGame() {
           {highScoreList.map((ele, i) => (
             <div key={`${i}_${JSON.stringify(ele)}`}>
               <div
-                className={`overlay-content-table ${
-                  i % 2 === 0 ? "grey-backgroud" : ""
-                }`}
+                className={`overlay-content-table ${i % 2 === 0 ? "grey-backgroud" : ""
+                  }`}
               >
                 <div className="overlay-table-column1">{ele.email}</div>
                 <div className="overlay-table-column2">
@@ -541,9 +539,8 @@ export default function MemoryGame() {
   const scoreFormatter = (seconds) => {
     const minutes = Math.floor(seconds / 60); // Get the minutes
     const remainingSeconds = seconds % 60; // Get the remaining seconds
-    return `${minutes} min ${
-      remainingSeconds < 10 ? "0" : ""
-    }${remainingSeconds} sec`;
+    return `${minutes} min ${remainingSeconds < 10 ? "0" : ""
+      }${remainingSeconds} sec`;
   };
 
   const onLogOutClick = () => {
