@@ -429,6 +429,7 @@ export default function MemoryGame() {
       <div className="game-body-wrapper">
         {isAllFlipped ? <ConfettiExplosion className="confetti" /> : null}
 
+        <div className="userGreeting">Hi, {userEmail}</div>
         <div className="progress-bar-wrapper">
           <ProgressBar
             showBar={false}
