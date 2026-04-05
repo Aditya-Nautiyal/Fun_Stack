@@ -114,14 +114,7 @@ export const submitScore = async (url: string, body: any) => {
   }
 };
 
-export const fetchHighScore = async (url: string, body: any) => {
-  try {
-    const result = await axiosInstance.post(url, { ...body });
-    return result;
-  } catch (err) {
-    return err;
-  }
-};
+
 
 /**
  * Listen for real-time updates to accepted friends for a user from Firestore.

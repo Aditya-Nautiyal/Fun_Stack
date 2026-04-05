@@ -8,8 +8,6 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const { db } = require("./firebaseAdmin");
 const EmployeeModel = require("./models/Employee.js");
-const ScoreModelForFour = require("./models/ScoreForFour.js");
-const ScoreModelForSix = require("./models/ScoreForSix.js");
 const FriendshipModel = require("./models/Friendship.js");
 const authenticate = require("./middlewares/authenticate.js");
 
@@ -196,34 +194,7 @@ app.post("/submitScore", authenticate, async (req, res) => {
   }
 });
 
-//Not using this endpoint, but keeping it for future use
-app.post("/getHighScore", authenticate, async (req, res) => {
-  const { matrixSize } = req.body;
-  try {
-    const collectionName = matrixSize === "4" ? "scoreForFour" : "scoreForSix";
-    const scoresRef = db.collection(collectionName);
 
-    const snapshot = await scoresRef.get();
-    const users = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        email: data.email,
-        score: data.score,
-      };
-    });
-
-    return res.json({
-      statusCode: DEFAULT_SUCCESS,
-      list: users,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.json({
-      statusCode: DEFAULT_ERROR,
-      desc: INTERNAL_SERVER_ERROR,
-    });
-  }
-});
 
 // Send a friend request
 app.post("/friend/request", authenticate, async (req, res) => {

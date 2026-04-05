@@ -22,7 +22,6 @@ import Timer from "../../components/timer/Timer.jsx";
 import ConfettiExplosion from "react-confetti-explosion";
 import {
   submitScore,
-  fetchHighScore,
   urlGenerator,
   listenToFriends,
   sendFriendRequest,
