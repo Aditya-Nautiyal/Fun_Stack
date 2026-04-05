@@ -61,7 +61,7 @@ import {
   ERR_SENDING_REQUEST,
   ERR_RESPONDING_REQUEST,
   EMAIL_HEADER,
-  LEADER_BOARD
+  LEADER_BOARD,
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -134,7 +134,7 @@ export default function MemoryGame() {
       if (!snap.empty) {
         highScore = snap.docs[0].data().score;
       }
-    } catch { }
+    } catch {}
     return { highScore };
   };
 
@@ -145,10 +145,14 @@ export default function MemoryGame() {
         friendListUnsubRef.current = listenToFriends(
           userEmail,
           async (friendEmails) => {
-            if (friendPresenceUnsubRef.current) friendPresenceUnsubRef.current();
-            friendPresenceUnsubRef.current = listenToFriendsPresence(friendEmails, (presenceMap) => {
-              setFriendPresence(presenceMap);
-            });
+            if (friendPresenceUnsubRef.current)
+              friendPresenceUnsubRef.current();
+            friendPresenceUnsubRef.current = listenToFriendsPresence(
+              friendEmails,
+              (presenceMap) => {
+                setFriendPresence(presenceMap);
+              },
+            );
 
             // Fetch high score for each friend
             const friendData = await Promise.all(
@@ -162,7 +166,7 @@ export default function MemoryGame() {
             );
             setFriendList(friendData);
             setIsFriendDataLoading(false);
-          }
+          },
         );
       }
 
@@ -447,10 +451,11 @@ export default function MemoryGame() {
               onClick={() => cirleClicked(ele)}
             >
               <div
-                className={`mGameCircle ${selectedItems.some((item) => item.id === ele.id)
-                  ? "is-flipped"
-                  : ""
-                  }`}
+                className={`mGameCircle ${
+                  selectedItems.some((item) => item.id === ele.id)
+                    ? "is-flipped"
+                    : ""
+                }`}
               >
                 {/* Initial button content */}
                 <div className="front" />
@@ -492,18 +497,18 @@ export default function MemoryGame() {
       // Start listening when opening overlay (top 10 unique users only)
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const rawList = snapshot.docs.map((doc) => doc.data());
-        
+
         // Deduplicate by email on the frontend
         const uniqueTopScores = [];
         const seenEmails = new Set();
-        
+
         for (const item of rawList) {
           if (!seenEmails.has(item.email)) {
-             seenEmails.add(item.email);
-             uniqueTopScores.push(item);
+            seenEmails.add(item.email);
+            uniqueTopScores.push(item);
           }
         }
-        
+
         // Now keep only the literal top 10 unique users to show on the UI
         setHighScoreList(uniqueTopScores.slice(0, 10));
       });
@@ -531,8 +536,9 @@ export default function MemoryGame() {
           {highScoreList.map((ele, i) => (
             <div key={`${i}_${JSON.stringify(ele)}`}>
               <div
-                className={`overlay-content-table ${i % 2 === 0 ? "grey-backgroud" : ""
-                  }`}
+                className={`overlay-content-table ${
+                  i % 2 === 0 ? "grey-backgroud" : ""
+                }`}
               >
                 <div className="overlay-table-column1">{ele.email}</div>
                 <div className="overlay-table-column2">
@@ -552,8 +558,9 @@ export default function MemoryGame() {
   const scoreFormatter = (seconds) => {
     const minutes = Math.floor(seconds / 60); // Get the minutes
     const remainingSeconds = seconds % 60; // Get the remaining seconds
-    return `${minutes} min ${remainingSeconds < 10 ? "0" : ""
-      }${remainingSeconds} sec`;
+    return `${minutes} min ${
+      remainingSeconds < 10 ? "0" : ""
+    }${remainingSeconds} sec`;
   };
 
   const onLogOutClick = () => {
@@ -625,7 +632,9 @@ export default function MemoryGame() {
                     <div className="overlay-table-column2">
                       <span
                         className={
-                          friendPresence[friend.email] ? "status-online" : "status-offline"
+                          friendPresence[friend.email]
+                            ? "status-online"
+                            : "status-offline"
                         }
                       >
                         {friendPresence[friend.email] ? ONLINE : OFFLINE}
@@ -654,9 +663,13 @@ export default function MemoryGame() {
                     className={`overlay-content-table friend-request-row ${idx % 2 === 0 ? "grey-backgroud" : ""}`}
                   >
                     <div className="overlay-table-column1">
-                      {req.requester === userEmail ? req.recipient : req.requester}
+                      {req.requester === userEmail
+                        ? req.recipient
+                        : req.requester}
                     </div>
-                    <div className={`overlay-table-column2 ${req.requester === userEmail ? "" : "friend-action-wrapper"}`}>
+                    <div
+                      className={`overlay-table-column2 ${req.requester === userEmail ? "" : "friend-action-wrapper"}`}
+                    >
                       {req.requester === userEmail ? (
                         <span className="status-pending">Pending</span>
                       ) : (

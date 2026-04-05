@@ -24,7 +24,7 @@ const {
   INTERNAL_SERVER_ERROR,
   TOKEN_CREATION_FALIED,
   REFRESH_TOKEN_REQUIRED,
-  INVALID_EXPIRED_TOKEN
+  INVALID_EXPIRED_TOKEN,
 } = require("./constants/string.js");
 const { DEFAULT_SUCCESS, DEFAULT_ERROR } = require("./constants/codes.js");
 const {
@@ -122,7 +122,7 @@ app.post("/register", (req, res) => {
             res.json({
               statusCode: DEFAULT_SUCCESS,
               desc: REGISTRATION_SUCCESS,
-            })
+            }),
           )
           .catch((err) => res.json(err));
       }
@@ -193,8 +193,6 @@ app.post("/submitScore", authenticate, async (req, res) => {
   }
 });
 
-
-
 app.post("/refresh-token", (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
@@ -207,9 +205,7 @@ app.post("/refresh-token", (req, res) => {
 
     return res.status(200).json({ accessToken: newAccessToken });
   } catch (err) {
-    return res
-      .status(403)
-      .json({ message: INVALID_EXPIRED_TOKEN });
+    return res.status(403).json({ message: INVALID_EXPIRED_TOKEN });
   }
 });
 
