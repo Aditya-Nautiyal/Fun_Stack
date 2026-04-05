@@ -62,6 +62,7 @@ import {
   ERR_SENDING_REQUEST,
   ERR_RESPONDING_REQUEST,
   EMAIL_HEADER,
+  LEADER_BOARD
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -488,11 +489,24 @@ export default function MemoryGame() {
         dropdownValue === "4" ? "scoreForFour" : "scoreForSix";
 
       const scoresRef = collection(db, collectionName);
-      const q = query(scoresRef, orderBy("score", "desc"), limit(10));
-      // Start listening when opening overlay (top 10 only)
+      const q = query(scoresRef, orderBy("score", "desc"), limit(50)); // Fetch more to allow for frontend deduplication
+      // Start listening when opening overlay (top 10 unique users only)
       const unsubscribe = onSnapshot(q, (snapshot) => {
-        const top10 = snapshot.docs.map((doc) => doc.data());
-        setHighScoreList(top10);
+        const rawList = snapshot.docs.map((doc) => doc.data());
+        
+        // Deduplicate by email on the frontend
+        const uniqueTopScores = [];
+        const seenEmails = new Set();
+        
+        for (const item of rawList) {
+          if (!seenEmails.has(item.email)) {
+             seenEmails.add(item.email);
+             uniqueTopScores.push(item);
+          }
+        }
+        
+        // Now keep only the literal top 10 unique users to show on the UI
+        setHighScoreList(uniqueTopScores.slice(0, 10));
       });
 
       // Store unsubscribe if needed later
@@ -737,7 +751,7 @@ export default function MemoryGame() {
           minimumSeconds={30}
         />
         <div className="topScore-container" onClick={toggleOverlay}>
-          {TOP_SCORE}
+          {LEADER_BOARD}
         </div>
       </div>
       {isOverlayOpen && (

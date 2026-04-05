@@ -45,6 +45,7 @@ export const FRIEND_REQUEST_SENT = "Friend request sent.";
 export const ERR_SENDING_REQUEST = "Error sending request";
 export const ERR_RESPONDING_REQUEST = "Error responding to request";
 export const EMAIL_HEADER = "Email";
+export const LEADER_BOARD = "Leader Board";
 
 
 

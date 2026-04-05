@@ -152,8 +152,8 @@ app.post("/submitScore", authenticate, async (req, res) => {
 
     const numericScore = Number(score);
 
-    if (userScores.length < 10) {
-      // Less than 10 scores, add new one
+    if (userScores.length === 0) {
+      // No existing score, add the new one
       await scoresRef.add({ email, score: numericScore });
       return res.json({
         statusCode: DEFAULT_SUCCESS,
@@ -161,17 +161,27 @@ app.post("/submitScore", authenticate, async (req, res) => {
       });
     }
 
-    const lowestTopScore = userScores[9].score;
+    const highestExistingScore = userScores[0].score;
 
-    if (numericScore > lowestTopScore) {
-      // Replace lowest score with new one
-      await scoresRef.doc(userScores[9].id).delete();
-      await scoresRef.add({ email, score: numericScore });
+    if (numericScore > highestExistingScore) {
+      // Update the highest score document with the new better score
+      await scoresRef.doc(userScores[0].id).update({ score: numericScore });
+      
+      // Cleanup any other documents for this user to enforce single score per user
+      for (let i = 1; i < userScores.length; i++) {
+        await scoresRef.doc(userScores[i].id).delete();
+      }
+
       return res.json({
         statusCode: DEFAULT_SUCCESS,
         desc: CONGRATULATIONS_HIGH_SCORE,
       });
     } else {
+      // Incoming score is not better, but we should clean up duplicate docs if any exist
+      for (let i = 1; i < userScores.length; i++) {
+        await scoresRef.doc(userScores[i].id).delete();
+      }
+
       return res.json({
         statusCode: DEFAULT_SUCCESS,
         desc: CONGRATULATIONS,
