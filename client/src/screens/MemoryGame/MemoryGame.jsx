@@ -29,6 +29,8 @@ import {
   listenToFriendRequests,
   updateUserPresence,
   listenToFriendsPresence,
+  sendBattleRequest,
+  listenToBattleRequests,
 } from "../../services/apiCall.tsx";
 import {
   FUN_STACK,
@@ -62,6 +64,13 @@ import {
   ERR_RESPONDING_REQUEST,
   EMAIL_HEADER,
   LEADER_BOARD,
+  CHALLENGE_BTN,
+  CHALLENGE_HEADER,
+  BATTLE_HEADER,
+  PENDING_BATTLE,
+  OFFLINE_MSG,
+  BATTLE_SENT,
+  ERR_SENDING_BATTLE,
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -117,6 +126,8 @@ export default function MemoryGame() {
   const [friendEmailInput, setFriendEmailInput] = useState("");
   const [activeTab, setActiveTab] = useState("friends"); // "friends" or "requests"
   const [isFriendDataLoading, setIsFriendDataLoading] = useState(false);
+  const [activeBattleRequests, setActiveBattleRequests] = useState({});
+  const battleRequestsUnsubRef = useRef(null);
   // Handler to open/close friend list overlay
   const fetchFriendStatusAndScore = async (email, matrixSize = "4") => {
     // High score: Query scoreForFour or scoreForSix, order by score desc, limit 1
@@ -218,6 +229,29 @@ export default function MemoryGame() {
       toast.success(res.message, ToastMsgStructure);
     } else {
       toast.error(res?.error || ERR_RESPONDING_REQUEST, ToastMsgStructure);
+    }
+  };
+
+  // Handler to send battle challenge request
+  const handleSendBattleChallenge = async (opponentEmail) => {
+    if (!userEmail || !opponentEmail) return;
+    
+    // Mark as pending temporarily
+    setActiveBattleRequests((prev) => ({
+      ...prev,
+      [opponentEmail]: "pending",
+    }));
+
+    const res = await sendBattleRequest(userEmail, opponentEmail, dropdownValue);
+    if (res?.message) {
+      toast.success(BATTLE_SENT, ToastMsgStructure);
+    } else {
+      toast.error(res?.error || ERR_SENDING_BATTLE, ToastMsgStructure);
+      // Reset if error
+      setActiveBattleRequests((prev) => ({
+        ...prev,
+        [opponentEmail]: null,
+      }));
     }
   };
 
@@ -618,33 +652,53 @@ export default function MemoryGame() {
                 <div className="overlay-table-header1">{EMAIL_HEADER}</div>
                 <div className="overlay-table-header2">{STATUS_HEADER}</div>
                 <div className="overlay-table-header2">{HIGH_SCORE_HEADER}</div>
+                <div className="overlay-table-header2">{BATTLE_HEADER}</div>
               </div>
               <SpaceFiller margin="10px" />
               {friendList.length === 0 ? (
                 <div className="friend-empty-state">{NO_FRIENDS}</div>
               ) : (
-                friendList.map((friend, idx) => (
-                  <div
-                    key={idx}
-                    className={`overlay-content-table ${idx % 2 === 0 ? "grey-backgroud" : ""}`}
-                  >
-                    <div className="overlay-table-column1">{friend.email}</div>
-                    <div className="overlay-table-column2">
-                      <span
-                        className={
-                          friendPresence[friend.email]
-                            ? "status-online"
-                            : "status-offline"
-                        }
-                      >
-                        {friendPresence[friend.email] ? ONLINE : OFFLINE}
-                      </span>
+                friendList.map((friend, idx) => {
+                  const isOnline = friendPresence[friend.email];
+                  const battleRequestStatus = activeBattleRequests[friend.email];
+                  
+                  return (
+                    <div
+                      key={idx}
+                      className={`overlay-content-table ${idx % 2 === 0 ? "grey-backgroud" : ""}`}
+                    >
+                      <div className="overlay-table-column1">{friend.email}</div>
+                      <div className="overlay-table-column2">
+                        <span
+                          className={
+                            isOnline
+                              ? "status-online"
+                              : "status-offline"
+                          }
+                        >
+                          {isOnline ? ONLINE : OFFLINE}
+                        </span>
+                      </div>
+                      <div className="overlay-table-column2">
+                        {friend.highScore ?? "-"}
+                      </div>
+                      <div className="overlay-table-column2">
+                        {!isOnline ? (
+                          <span className="battle-disabled-text">{OFFLINE_MSG}</span>
+                        ) : battleRequestStatus === "pending" ? (
+                          <span className="battle-pending-text">{PENDING_BATTLE}</span>
+                        ) : (
+                          <button
+                            className="battle-challenge-btn"
+                            onClick={() => handleSendBattleChallenge(friend.email)}
+                          >
+                            {CHALLENGE_BTN}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="overlay-table-column2">
-                      {friend.highScore ?? "-"}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </>
           ) : (

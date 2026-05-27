@@ -411,3 +411,32 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   margin-bottom: 15px;
 }
+
+.battle-challenge-btn {
+  padding: 5px 10px;
+  background-color: green;
+  color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 12px;
+  transition: opacity 0.3s ease;
+}
+
+.battle-challenge-btn:hover {
+  opacity: 0.8;
+}
+
+.battle-disabled-text {
+  color: gray;
+  font-weight: bold;
+}
+
+.battle-pending-text {
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffa500;
+}

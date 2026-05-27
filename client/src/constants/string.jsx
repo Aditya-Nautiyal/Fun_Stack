@@ -46,6 +46,14 @@ export const ERR_SENDING_REQUEST = "Error sending request";
 export const ERR_RESPONDING_REQUEST = "Error responding to request";
 export const EMAIL_HEADER = "Email";
 export const LEADER_BOARD = "Leader Board";
+export const CHALLENGE_BTN = "Challenge";
+export const CHALLENGE_HEADER = "Challenge";
+export const BATTLE_HEADER = "1V1";
+export const PENDING_BATTLE = "Pending...";
+export const OFFLINE_MSG = "Offline";
+export const BATTLE_SENT = "Battle challenge sent!";
+export const ERR_SENDING_BATTLE = "Error sending challenge";
+export const LIVE_BATTLE = "🔴 LIVE BATTLE 🔴";
 
 
 

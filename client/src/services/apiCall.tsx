@@ -267,3 +267,96 @@ export const listenToFriendsPresence = (
     }
   );
 };
+
+/**
+ * Send a battle challenge request to another user
+ * @param challenger The email of the user sending the challenge
+ * @param opponent The email of the opponent
+ * @param gridSize "4" or "6" (grid size for the battle)
+ * @returns { message } on success or { error } on failure
+ */
+export const sendBattleRequest = async (
+  challenger: string,
+  opponent: string,
+  gridSize: "4" | "6" = "4",
+) => {
+  if (!challenger || !opponent || challenger === opponent) {
+    return { error: "Invalid challenger or opponent." };
+  }
+  try {
+    // Check for existing pending/active battle request
+    const q = query(
+      collection(db, "battleRequests"),
+      and(
+        or(
+          and(
+            where("challenger", "==", challenger),
+            where("opponent", "==", opponent)
+          ),
+          and(
+            where("challenger", "==", opponent),
+            where("opponent", "==", challenger)
+          )
+        ),
+        where("status", "in", ["pending", "accepted", "in_progress"])
+      )
+    );
+    const existing = await getDocs(q);
+    if (!existing.empty) {
+      return { error: "Battle request already exists." };
+    }
+
+    await addDoc(collection(db, "battleRequests"), {
+      challenger,
+      opponent,
+      status: "pending",
+      gridSize,
+      createdAt: serverTimestamp(),
+    });
+    return { message: "Battle challenge sent." };
+  } catch (err) {
+    let errorMsg = "Error sending battle challenge.";
+    if (err && typeof err === "object" && "message" in err) {
+      errorMsg = (err as { message?: string }).message || errorMsg;
+    }
+    return { error: errorMsg };
+  }
+};
+
+/**
+ * Listen for real-time updates to battle requests
+ * @param userEmail The email of the current user
+ * @param callback Function to call with the updated requests array
+ * @returns Unsubscribe function to stop listening
+ */
+export const listenToBattleRequests = (
+  userEmail: string,
+  callback: (requests: DocumentData[]) => void,
+) => {
+  const q = query(
+    collection(db, "battleRequests"),
+    and(
+      where("status", "==", "pending"),
+      or(
+        where("opponent", "==", userEmail),
+        where("challenger", "==", userEmail)
+      )
+    )
+  );
+
+  const unsub = onSnapshot(
+    q,
+    (snapshot: QuerySnapshot<DocumentData>) => {
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(requests);
+    },
+    (err) => {
+      console.error("Firebase Battle Requests Error: ", err.message);
+    }
+  );
+
+  return unsub;
+};
