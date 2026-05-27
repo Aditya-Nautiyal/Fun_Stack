@@ -440,3 +440,60 @@
   font-weight: bold;
   color: #ffa500;
 }
+
+.friend-action-wrapper {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.battle-accept-icon-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: green;
+  color: white;
+  border: 1px solid black;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.battle-accept-icon-btn:hover {
+  opacity: 0.8;
+}
+
+.battle-reject-icon-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: red;
+  color: white;
+  border: 1px solid black;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.battle-reject-icon-btn:hover {
+  opacity: 0.8;
+}
+.battle-action-wrapper{
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}

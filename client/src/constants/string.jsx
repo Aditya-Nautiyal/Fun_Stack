@@ -54,6 +54,11 @@ export const OFFLINE_MSG = "Offline";
 export const BATTLE_SENT = "Battle challenge sent!";
 export const ERR_SENDING_BATTLE = "Error sending challenge";
 export const LIVE_BATTLE = "🔴 LIVE BATTLE 🔴";
+export const CHALLENGING = "Challenging";
+export const ERR_ACCEPTING_BATTLE = "Error accepting challenge";
+export const ERR_REJECTING_BATTLE = "Error rejecting challenge";
+export const BATTLE_ACCEPTED = "Challenge accepted! Starting battle...";
+export const BATTLE_REJECTED = "Challenge rejected.";
 
 
 

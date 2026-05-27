@@ -31,6 +31,7 @@ import {
   listenToFriendsPresence,
   sendBattleRequest,
   listenToBattleRequests,
+  respondBattleRequest,
 } from "../../services/apiCall.tsx";
 import {
   FUN_STACK,
@@ -71,6 +72,11 @@ import {
   OFFLINE_MSG,
   BATTLE_SENT,
   ERR_SENDING_BATTLE,
+  CHALLENGING,
+  ERR_ACCEPTING_BATTLE,
+  ERR_REJECTING_BATTLE,
+  BATTLE_ACCEPTED,
+  BATTLE_REJECTED,
 } from "../../constants/string";
 import { LoginAndSignUp } from "../../constants/navigation.jsx";
 import { GENERIC_FAILIURE, GENERIC_SUCCESS } from "../../constants/codes.jsx";
@@ -127,6 +133,8 @@ export default function MemoryGame() {
   const [activeTab, setActiveTab] = useState("friends"); // "friends" or "requests"
   const [isFriendDataLoading, setIsFriendDataLoading] = useState(false);
   const [activeBattleRequests, setActiveBattleRequests] = useState({});
+  // Maps incoming battle request to friend email: { "john@email": requestId }
+  const [incomingBattleRequests, setIncomingBattleRequests] = useState({});
   const battleRequestsUnsubRef = useRef(null);
   // Handler to open/close friend list overlay
   const fetchFriendStatusAndScore = async (email, matrixSize = "4") => {
@@ -190,6 +198,31 @@ export default function MemoryGame() {
           },
         );
       }
+
+      // Set up Firestore real-time listener for battle requests
+      if (userEmail && !battleRequestsUnsubRef.current) {
+        battleRequestsUnsubRef.current = listenToBattleRequests(
+          userEmail,
+          (battleReqs) => {
+            // Build map of incoming battle requests: { friendEmail: requestId }
+            const incomingMap = {};
+            const outgoingMap = {};
+            
+            battleReqs.forEach((req) => {
+              if (req.opponent === userEmail && req.challenger !== userEmail) {
+                // Incoming request from challenger
+                incomingMap[req.challenger] = req.id;
+              } else if (req.challenger === userEmail && req.opponent !== userEmail) {
+                // Outgoing request to opponent
+                outgoingMap[req.opponent] = "pending";
+              }
+            });
+            
+            setIncomingBattleRequests(incomingMap);
+            setActiveBattleRequests(outgoingMap);
+          },
+        );
+      }
     } else {
       setFriendEmailInput("");
       setActiveTab("friends");
@@ -205,6 +238,10 @@ export default function MemoryGame() {
       if (friendPresenceUnsubRef.current) {
         friendPresenceUnsubRef.current();
         friendPresenceUnsubRef.current = null;
+      }
+      if (battleRequestsUnsubRef.current) {
+        battleRequestsUnsubRef.current();
+        battleRequestsUnsubRef.current = null;
       }
     }
     setFriendOverlayOpen((prev) => !prev);
@@ -229,6 +266,25 @@ export default function MemoryGame() {
       toast.success(res.message, ToastMsgStructure);
     } else {
       toast.error(res?.error || ERR_RESPONDING_REQUEST, ToastMsgStructure);
+    }
+  };
+
+  // Handler to accept or reject battle challenge
+  const handleBattleResponse = async (friendEmail, action) => {
+    const requestId = incomingBattleRequests[friendEmail];
+    if (!requestId) return;
+
+    const res = await respondBattleRequest(requestId, action);
+    if (res?.message) {
+      if (action === "accept") {
+        toast.success(BATTLE_ACCEPTED, ToastMsgStructure);
+        // TODO: Redirect to battle screen with battleId
+      } else {
+        toast.success(BATTLE_REJECTED, ToastMsgStructure);
+      }
+    } else {
+      const errorMsg = action === "accept" ? ERR_ACCEPTING_BATTLE : ERR_REJECTING_BATTLE;
+      toast.error(res?.error || errorMsg, ToastMsgStructure);
     }
   };
 
@@ -316,6 +372,10 @@ export default function MemoryGame() {
       if (friendPresenceUnsubRef.current) {
         friendPresenceUnsubRef.current();
         friendPresenceUnsubRef.current = null;
+      }
+      if (battleRequestsUnsubRef.current) {
+        battleRequestsUnsubRef.current();
+        battleRequestsUnsubRef.current = null;
       }
     };
   }, []);
@@ -661,6 +721,7 @@ export default function MemoryGame() {
                 friendList.map((friend, idx) => {
                   const isOnline = friendPresence[friend.email];
                   const battleRequestStatus = activeBattleRequests[friend.email];
+                  const hasIncomingRequest = incomingBattleRequests[friend.email];
                   
                   return (
                     <div
@@ -685,6 +746,23 @@ export default function MemoryGame() {
                       <div className="overlay-table-column2">
                         {!isOnline ? (
                           <span className="battle-disabled-text">{OFFLINE_MSG}</span>
+                        ) : hasIncomingRequest ? (
+                          <div className="battle-action-wrapper">
+                            <button
+                              className="battle-accept-icon-btn"
+                              onClick={() => handleBattleResponse(friend.email, "accept")}
+                              title="Accept Challenge"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              className="battle-reject-icon-btn"
+                              onClick={() => handleBattleResponse(friend.email, "reject")}
+                              title="Reject Challenge"
+                            >
+                              ✕
+                            </button>
+                          </div>
                         ) : battleRequestStatus === "pending" ? (
                           <span className="battle-pending-text">{PENDING_BATTLE}</span>
                         ) : (

@@ -360,3 +360,32 @@ export const listenToBattleRequests = (
 
   return unsub;
 };
+
+/**
+ * Respond to a battle request (accept or reject)
+ * @param requestId The Firestore document ID of the battle request
+ * @param action "accept" or "reject"
+ * @returns { message } on success or { error } on failure
+ */
+export const respondBattleRequest = async (
+  requestId: string,
+  action: "accept" | "reject",
+) => {
+  if (!requestId || !["accept", "reject"].includes(action)) {
+    return { error: "Invalid input." };
+  }
+  try {
+    const requestRef = doc(db, "battleRequests", requestId);
+    await updateDoc(requestRef, {
+      status: action === "accept" ? "accepted" : "rejected",
+      respondedAt: serverTimestamp(),
+    });
+    return { message: `Battle request ${action}ed.` };
+  } catch (err) {
+    let errorMsg = "Error updating battle request.";
+    if (err && typeof err === "object" && "message" in err) {
+      errorMsg = (err as { message?: string }).message || errorMsg;
+    }
+    return { error: errorMsg };
+  }
+};
